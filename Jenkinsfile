@@ -4,7 +4,7 @@ pipeline {
     environment {
         INVENTORY   = "hosts"
         PLAYBOOK    = "deploy.yml"
-        ANSIBLE_DIR = "healthify-deployment"
+        ANSIBLE_DIR = "Healthify-ProductionPipeline"
     }
 
     stages {
