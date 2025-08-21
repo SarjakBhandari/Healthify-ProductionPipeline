@@ -3,12 +3,10 @@ version: "3.8"
 services:
   prometheus:
     image: prom/prometheus:v2.51.2
-    volumes:
-      - type: bind
-        source: ./prometheus/prometheus.yml
+    configs:
+      - source: ./prometheus/prometheus.yml
         target: /etc/prometheus/prometheus.yml
-      - type: bind
-        source: ./prometheus/alert.rules.yml
+      - source: ./prometheus/alert.rules.yml
         target: /etc/prometheus/alert.rules.yml
     networks:
       - healthify_net
@@ -66,4 +64,10 @@ volumes:
 
 networks:
   healthify_net:
+    external: true
+
+configs:
+  prometheus.yml:
+    external: true
+  alert.rules.yml:
     external: true
