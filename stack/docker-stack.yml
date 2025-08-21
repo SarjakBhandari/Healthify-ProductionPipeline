@@ -54,7 +54,7 @@ services:
   frontend:
     image: 192.168.50.4:5000/healthify-frontend:latest
     environment:
-      API_BASE_URL: http://192.168.50.4:5050
+      API_BASE_URL: http://192.168.50.4:5050/api/
     ports:
       - "5173:5173"
     networks:
@@ -78,4 +78,5 @@ volumes:
   pgdata:
 
 networks:
-  health
+  healthify_net:
+    driver: overlay
