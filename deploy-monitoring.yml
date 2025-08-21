@@ -1,0 +1,8 @@
+- name: Deploy Monitoring Stack
+  hosts: manager
+  become: yes
+  tasks:
+    - name: Deploy monitoring stack
+      shell: docker stack deploy -c stack/prometheus/monitoring.yml monitoring
+      args:
+        warn: false
