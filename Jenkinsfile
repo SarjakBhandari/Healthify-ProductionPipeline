@@ -7,6 +7,7 @@ pipeline {
         ANSIBLE_DIR = "Healthify-ProductionPipeline"
     }
 
+    stages {
         stage('Prepare Workspace') {
             steps {
                 deleteDir()
@@ -27,7 +28,6 @@ pipeline {
                 }
             }
         }
-
     }
 
     post {
