@@ -22,34 +22,24 @@ pipeline {
     stages {
         stage('Workspace Cleanup') {
             steps {
+                echo "🧹 Cleaning up workspace..."
                 cleanWs()
             }
         }
 
         stage('Checkout') {
             steps {
+                echo "📥 Cloning repository..."
                 git branch: 'main', url: 'https://github.com/SarjakBhandari/Healthify-ProductionPipeline.git'
-            }
-        }
-
-        stage('Preflight: Node Prep') {
-            steps {
-                sh '''
-                    echo "🔧 Running node prep playbook..."
-                    ansible-playbook -i ${INVENTORY} prep_nodes.yml
-                '''
             }
         }
 
         stage('Deploy to Swarm') {
             steps {
                 sh '''
-                    echo "📦 Installing required Ansible collections..."
-                    ansible-galaxy collection install -r collections/requirements.yml
-
                     echo "🚀 Deploying Healthify stack with tag ${IMAGE_TAG}..."
                     ansible-playbook -i ${INVENTORY} ${PLAYBOOK} \
-                      --extra-vars "\
+                        --extra-vars "\
 image_tag=${IMAGE_TAG} \
 DB_USER=${DB_USER} \
 DB_PASSWORD=${DB_PASSWORD} \

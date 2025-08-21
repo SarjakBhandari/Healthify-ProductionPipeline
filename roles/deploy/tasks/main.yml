@@ -1,22 +1,22 @@
 ---
-- name: Pull images from staging registry
-  community.docker.docker_image:
-    name: "{{ registry_ip }}:{{ registry_port }}/{{ item.name }}"
-    tag: "{{ image_tag }}"
-    source: pull
+- name: Pull images from staging registry via CLI
+  ansible.builtin.shell: |
+    docker pull {{ registry_ip }}:{{ registry_port }}/{{ item.name }}:{{ image_tag }}
   loop:
     - { name: "healthify-frontend" }
     - { name: "healthify-backend" }
     - { name: "postgres" }
+  args:
+    warn: false
 
 - name: Template production docker-compose file
   ansible.builtin.template:
     src: docker-compose.prod.yml.j2
     dest: /tmp/docker-compose.prod.yml
 
-- name: Deploy stack to Swarm
-  community.docker.docker_stack:
-    state: present
-    name: "{{ app_stack_name }}"
-    compose:
-      - /tmp/docker-compose.prod.yml
+- name: Deploy stack to Swarm via CLI
+  ansible.builtin.shell: |
+    docker stack deploy -c /tmp/docker-compose.prod.yml {{ app_stack_name }}
+  args:
+    chdir: /tmp
+    warn: false
