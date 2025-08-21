@@ -52,6 +52,22 @@
         group: jenkins
         mode: '0755'
 
+    - name: Copy grafana.yml provisioning file
+      copy:
+        src: "./stack/prometheus/grafana.yml"
+        dest: /home/jenkins/monitoring-stack/grafana.yml
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+
+    - name: Copy Grafana dashboards
+      copy:
+        src: "./stack/prometheus/dashboards/"
+        dest: /home/jenkins/monitoring-stack/dashboards/"
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+
     - name: Copy monitoring.yml to manager
       copy:
         src: "./stack/monitoring.yml"
@@ -107,6 +123,17 @@
 
     - name: Create fresh Alert rules config
       shell: docker config create alert.rules.yml /home/jenkins/monitoring-stack/alert.rules.yml
+      args:
+        executable: /bin/bash
+
+    - name: Remove existing Grafana provisioning config
+      shell: docker config rm grafana.yml || true
+      args:
+        executable: /bin/bash
+      ignore_errors: true
+
+    - name: Create fresh Grafana provisioning config
+      shell: docker config create grafana.yml /home/jenkins/monitoring-stack/grafana.yml
       args:
         executable: /bin/bash
 

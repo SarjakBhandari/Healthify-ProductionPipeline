@@ -1,0 +1,29 @@
+{
+  "uid": "postgres",
+  "title": "PostgreSQL Metrics",
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "Active Connections",
+      "targets": [
+        {
+          "expr": "pg_stat_activity_count",
+          "legendFormat": "Connections"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Cache Hit Ratio",
+      "targets": [
+        {
+          "expr": "pg_stat_database_blks_hit / (pg_stat_database_blks_hit + pg_stat_database_blks_read)",
+          "legendFormat": "Cache Hit"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 36,
+  "version": 1
+}

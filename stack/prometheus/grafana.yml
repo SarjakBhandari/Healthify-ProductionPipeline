@@ -1,0 +1,21 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://192.168.50.4:9090
+    isDefault: true
+    editable: true
+    version: 1
+    orgId: 1
+
+dashboards:
+  - name: Healthify Dashboards
+    orgId: 1
+    folder: "Healthify"
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards
