@@ -2,19 +2,63 @@ version: "3.2"
 
 services:
   postgres:
-    extends:
-      file: ./postgres.yml
-      service: postgres
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: healthify
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - healthify_net
+    deploy:
+      placement:
+        constraints: [node.role == manager]
 
   backend:
-    extends:
-      file: ./backend.yml
-      service: backend
+    image: 192.168.50.4:5000/healthify-backend:latest
+    environment:
+      PORT: 5050
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: healthify
+      JWT_SECRET: healthify
+      EXPIRES_IN: 24h
+    ports:
+      - "5050:5050"
+    depends_on:
+      - postgres
+    networks:
+      - healthify_net
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        delay: 10s
 
   frontend:
-    extends:
-      file: ./frontend.yml
-      service: frontend
+    image: 192.168.50.4:5000/healthify-frontend:latest
+    environment:
+      - API_BASE_URL=http://192.168.50.4:5050/api/
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - healthify_net
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        delay: 10s
+
+volumes:
+  pgdata:
 
 networks:
   healthify_net:
