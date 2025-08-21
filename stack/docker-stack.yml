@@ -23,7 +23,7 @@ services:
       retries: 5
 
   backend:
-    image: 192.168.50.4:5000/healthify-backend:latest  # Explicitly include latest
+    image: 192.168.50.4:5000/healthify-backend:latest
     environment:
       PORT: 5050
       DB_HOST: postgres
@@ -36,6 +36,8 @@ services:
       - "5050:5050"
     networks:
       - healthify_net
+    depends_on:
+      - postgres
     deploy:
       replicas: 2
       restart_policy:
@@ -47,13 +49,15 @@ services:
       retries: 5
 
   frontend:
-    image: 192.168.50.4:5000/healthify-frontend:latest  # Explicitly include latest
+    image: 192.168.50.4:5000/healthify-frontend:latest
     environment:
-      API_BASE_URL: http://192.168.50.4:5050/api
+      API_BASE_URL: http://backend:5050/api
     ports:
       - "5173:5173"
     networks:
       - healthify_net
+    depends_on:
+      - backend
     deploy:
       replicas: 2
       restart_policy:
@@ -65,11 +69,3 @@ services:
       test: ["CMD-SHELL", "curl -f http://localhost:5173 || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 5
-
-volumes:
-  pgdata:
-
-networks:
-  healthify_net:
-    driver: overlay
