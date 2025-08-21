@@ -16,7 +16,7 @@
 
     - name: Copy monitoring.yml to manager
       copy:
-        src: "/stack/monitoring.yml"
+        src: "./stack/monitoring.yml"
         dest: /home/jenkins/monitoring-stack/monitoring.yml
         owner: jenkins
         group: jenkins
