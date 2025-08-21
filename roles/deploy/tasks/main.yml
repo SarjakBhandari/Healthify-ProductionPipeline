@@ -1,6 +1,9 @@
 ---
 - name: Pull images from staging registry via CLI
+  become: true
   ansible.builtin.shell: |
+    set -e
+    echo "Pulling image: {{ registry_ip }}:{{ registry_port }}/{{ item.name }}:{{ image_tag }}"
     docker pull {{ registry_ip }}:{{ registry_port }}/{{ item.name }}:{{ image_tag }}
   loop:
     - { name: "healthify-frontend" }
@@ -13,9 +16,13 @@
   ansible.builtin.template:
     src: docker-compose.prod.yml.j2
     dest: /tmp/docker-compose.prod.yml
+    mode: '0644'
 
 - name: Deploy stack to Swarm via CLI
+  become: true
   ansible.builtin.shell: |
+    set -e
+    echo "Deploying stack: {{ app_stack_name }}"
     docker stack deploy -c /tmp/docker-compose.prod.yml {{ app_stack_name }}
   args:
     chdir: /tmp
