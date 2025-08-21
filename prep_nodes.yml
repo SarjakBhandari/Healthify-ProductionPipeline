@@ -1,17 +1,48 @@
 ---
 - hosts: all
   become: true
+  vars:
+    preferred_python_version: "3.11"
+
   tasks:
-    - name: Ensure Python + pip + version support
+    - name: Check current Python version
+      command: python3 -c "import sys; print(sys.version_info.major, sys.version_info.minor)"
+      register: python_version_output
+      changed_when: false
+
+    - name: Set Python downgrade flag if version >= 3.12
+      set_fact:
+        downgrade_python: true
+      when: >
+        (python_version_output.stdout.split()[0] | int == 3) and
+        (python_version_output.stdout.split()[1] | int >= 12)
+
+    - name: Install Python {{ preferred_python_version }} if downgrade needed
+      apt:
+        name:
+          - python{{ preferred_python_version }}
+          - python{{ preferred_python_version }}-distutils
+          - python{{ preferred_python_version }}-venv
+          - python{{ preferred_python_version }}-dev
+        state: present
+      when: downgrade_python | default(false)
+
+    - name: Set python3 symlink to Python {{ preferred_python_version }}
+      alternatives:
+        name: python3
+        path: "/usr/bin/python{{ preferred_python_version }}"
+      when: downgrade_python | default(false)
+
+    - name: Ensure base Python + pip + version support
       apt:
         name:
           - python3
           - python3-pip
           - python3-distutils
-          - python3-setuptools    # <-- This is the missing piece
+          - python3-setuptools
           - python3-apt
         state: present
-      when: ansible_os_family == "Debian"
+      when: not downgrade_python | default(false)
 
     - name: Ensure packaging module (modern version parsing)
       pip:
@@ -19,5 +50,11 @@
         state: latest
         executable: pip3
 
-    - name: Verify distutils.version is available
+    - name: Verify version parsing support
       command: python3 -c "from distutils.version import StrictVersion; print('StrictVersion OK')"
+      register: version_check
+      ignore_errors: true
+
+    - name: Show version check result
+      debug:
+        msg: "{{ version_check.stdout | default('Version check failed') }}"
