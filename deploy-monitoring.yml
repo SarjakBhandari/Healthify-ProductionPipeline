@@ -19,6 +19,7 @@
         mode: '0644'
 
     - name: Deploy monitoring stack
+      shell: pwd
       shell: docker stack deploy -c /home/jenkins/monitoring-stack/monitoring.yml monitoring
       args:
         warn: false
