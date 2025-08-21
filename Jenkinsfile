@@ -15,13 +15,12 @@ pipeline {
             }
         }
 
-        stage('Deploy to Swarm via Ansible') {
+        stage('Deploy Healthify & Monitoring Stack') {
             steps {
                 dir("${ANSIBLE_DIR}") {
                     sh '''
                         set -e
                         echo ">>> Running Ansible Playbook for Swarm Deployment..."
-                        # Optional syntax check before running
                         ansible-playbook --syntax-check -i ${INVENTORY} ${PLAYBOOK}
                         ansible-playbook -i ${INVENTORY} ${PLAYBOOK}
                     '''
@@ -33,11 +32,13 @@ pipeline {
     post {
         success {
             mail to: 'sarjakytdfiles@gmail.com',
-                 subject: 'HEALTHIFY SWARM DEPLOYMENT SUCCESS',
+                 subject: 'HEALTHIFY + MONITORING DEPLOYMENT SUCCESS',
                  body: """Deployment succeeded ✅
 
-App: http://192.168.50.4:5173
-API: http://192.168.50.4:5050
+App: http://192.168.50.4:5173  
+API: http://192.168.50.4:5050  
+Prometheus: http://192.168.50.4:9090  
+Grafana: http://192.168.50.4:3000 (admin/admin)
 
 Check services with:
 docker service ls
@@ -46,8 +47,8 @@ Build URL: ${BUILD_URL}"""
         }
         failure {
             mail to: 'sarjakytdfiles@gmail.com',
-                 subject: 'HEALTHIFY SWARM DEPLOYMENT FAILURE',
-                 body: """Deployment failed ❌
+                 subject: 'HEALTHIFY + MONITORING DEPLOYMENT FAILURE',
+                 body: """Deployment failed ❌  
 Check Jenkins logs: ${BUILD_URL}"""
         }
     }
