@@ -42,6 +42,7 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
+      placement:
         constraints: [node.role == manager]
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:5050/health || exit 1"]
