@@ -1,8 +1,15 @@
 ---
 - name: Deploy Healthify Stack to Docker Swarm
-  hosts: manager
+  hosts: all
   become: yes
+
   tasks:
+    - name: Ensure Docker is running
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
     - name: Create deployment directory on manager
       file:
         path: /home/jenkins/healthify-stack
@@ -19,5 +26,13 @@
         group: jenkins
         mode: 0644
 
-    - name: Deploy stack
+    - name: Deploy Healthify stack
       shell: docker stack deploy -c /home/jenkins/healthify-stack/docker-stack.yml healthify
+      args:
+        warn: false
+      register: deploy_result
+      changed_when: "'Updating' in deploy_result.stdout or 'Creating' in deploy_result.stdout"
+
+    - name: Display deployment output
+      debug:
+        var: deploy_result.stdout_lines

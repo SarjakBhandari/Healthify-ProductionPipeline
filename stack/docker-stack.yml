@@ -40,10 +40,10 @@ services:
       - postgres
     deploy:
       replicas: 2
-      restart_policy:
-        condition: on-failure
       placement:
         constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:5050/health || exit 1"]
       interval: 30s
