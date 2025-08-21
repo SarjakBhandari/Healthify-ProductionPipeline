@@ -8,6 +8,25 @@ pipeline {
     }
 
     stages {
+
+        stage('Clean Old Containers & Images') {
+            steps {
+                script {
+                    sh '''
+                        echo ">>> Stopping and removing old Healthify containers..."
+                        docker ps --filter "name=healthify" --format "{{.ID}}" | xargs -r docker stop
+                        docker ps -a --filter "name=healthify" --format "{{.ID}}" | xargs -r docker rm -f
+
+                        echo ">>> Removing old Healthify images..."
+                        docker images --format "{{.Repository}}:{{.Tag}}" | grep -E "healthify-(frontend|backend)" | xargs -r docker rmi -f
+
+                        echo ">>> Removing dangling images..."
+                        docker images -f "dangling=true" -q | xargs -r docker rmi -f
+                    '''
+                }
+            }
+        }
+
         stage('Prepare Workspace') {
             steps {
                 deleteDir()
@@ -28,6 +47,7 @@ pipeline {
                 }
             }
         }
+
     }
 
     post {
