@@ -23,7 +23,7 @@ services:
       retries: 5
 
   backend:
-    image: 192.168.50.4:5000/healthify-backend:latest
+    image: 192.168.50.4:5000/healthify-backend:latest  # Explicitly include latest
     environment:
       PORT: 5050
       DB_HOST: postgres
@@ -46,9 +46,8 @@ services:
       timeout: 5s
       retries: 5
 
-
   frontend:
-    image: 192.168.50.4:5000/healthify-frontend:latest
+    image: 192.168.50.4:5000/healthify-frontend:latest  # Explicitly include latest
     environment:
       API_BASE_URL: http://192.168.50.4:5050/api
     ports:
