@@ -1,19 +1,14 @@
 ---
 - hosts: all
   become: true
-  vars:
-    preferred_python_version: "3.11"
-    ansible_venv_path: "/opt/ansible-venv"
 
   tasks:
-    - name: "Install Python {{ preferred_python_version }} and dependencies"
+    - name: "Ensure Python, pip, and dependencies"
       apt:
         name:
-          - python{{ preferred_python_version }}
-          - python{{ preferred_python_version }}-distutils
-          - python{{ preferred_python_version }}-venv
-          - python{{ preferred_python_version }}-dev
+          - python3
           - python3-pip
+          - python3-distutils
           - python3-setuptools
           - python3-apt
         state: present
@@ -25,30 +20,11 @@
         state: latest
         executable: pip3
 
-    - name: "Set python3 symlink to Python {{ preferred_python_version }}"
-      alternatives:
-        name: python3
-        path: "/usr/bin/python{{ preferred_python_version }}"
-
     - name: "Verify distutils.version availability"
       command: python3 -c "from distutils.version import StrictVersion; print('StrictVersion OK')"
       register: version_check
       ignore_errors: true
 
-    - name: "Create Python {{ preferred_python_version }} virtualenv for Ansible"
-      command: python{{ preferred_python_version }} -m venv {{ ansible_venv_path }}
-      args:
-        creates: "{{ ansible_venv_path }}"
-
-    - name: "Install Ansible in virtualenv"
-      command: "{{ ansible_venv_path }}/bin/pip install ansible"
-
     - name: "Show version check result"
       debug:
         msg: "{{ version_check.stdout | default('Version check failed') }}"
-
-    - name: "Summary - Python version and venv"
-      debug:
-        msg: >
-          Python version: {{ preferred_python_version }},
-          Ansible venv: {{ ansible_venv_path }}
