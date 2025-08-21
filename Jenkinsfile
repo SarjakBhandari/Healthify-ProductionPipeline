@@ -17,12 +17,13 @@ pipeline {
     environment {
         INVENTORY = 'inventory.yml'
         PLAYBOOK  = 'deploy_app.yml'
+        VENV_PATH = '/opt/ansible-venv'
     }
 
     stages {
         stage('Workspace Cleanup') {
             steps {
-                cleanWs()  // Jenkins built-in step to clear the workspace
+                cleanWs()
             }
         }
 
@@ -31,18 +32,21 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/SarjakBhandari/Healthify-ProductionPipeline.git'
             }
         }
+
         stage('Preflight: Node Prep') {
-    steps {
-        sh '''
-            ansible-playbook -i ${INVENTORY} prep_nodes.yml
-        '''
-    }
-}
+            steps {
+                sh '''
+                    echo "🔧 Running node prep playbook..."
+                    ansible-playbook -i ${INVENTORY} prep_nodes.yml
+                '''
+            }
+        }
 
         stage('Deploy to Swarm') {
             steps {
                 sh '''
                     echo "📦 Installing required Ansible collections..."
+                    source ${VENV_PATH}/bin/activate || { echo "❌ Virtualenv not found at ${VENV_PATH}"; exit 1; }
                     ansible-galaxy collection install -r collections/requirements.yml
 
                     echo "🚀 Deploying Healthify stack with tag ${IMAGE_TAG}..."
