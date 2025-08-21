@@ -31,6 +31,13 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/SarjakBhandari/Healthify-ProductionPipeline.git'
             }
         }
+        stage('Preflight: Node Prep') {
+    steps {
+        sh '''
+            ansible-playbook -i ${INVENTORY} /collections/prep_nodes.yml
+        '''
+    }
+}
 
         stage('Deploy to Swarm') {
             steps {
