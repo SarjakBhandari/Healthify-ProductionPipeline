@@ -18,12 +18,12 @@ services:
         condition: on-failure
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
+      interval: 30s
+      timeout: 10s
       retries: 5
 
   backend:
-    image: 192.168.50.4:5000/healthify-backend:latest
+    image: healthify-backend:latest
     environment:
       PORT: 5050
       DB_HOST: postgres
@@ -42,16 +42,17 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
+        constraints: [node.role == manager]
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:5050/health || exit 1"]
-      interval: 10s
-      timeout: 5s
+      interval: 30s
+      timeout: 10s
       retries: 5
 
   frontend:
-    image: 192.168.50.4:5000/healthify-frontend:latest
+    image: healthify-frontend:latest
     environment:
-      API_BASE_URL: http://backend:5050/api
+      API_BASE_URL: http://192.168.40.4:5050/api
     ports:
       - "5173:5173"
     networks:
@@ -67,5 +68,13 @@ services:
         delay: 10s
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:5173 || exit 1"]
-      interval: 10s
-      timeout: 5s
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  pgdata:
+
+networks:
+  healthify_net:
+    driver: overlay
