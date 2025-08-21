@@ -17,7 +17,6 @@ pipeline {
     environment {
         INVENTORY = 'inventory.yml'
         PLAYBOOK  = 'deploy_app.yml'
-        VENV_PATH = '/opt/ansible-venv'
     }
 
     stages {
@@ -46,7 +45,6 @@ pipeline {
             steps {
                 sh '''
                     echo "📦 Installing required Ansible collections..."
-                    source ${VENV_PATH}/bin/activate || { echo "❌ Virtualenv not found at ${VENV_PATH}"; exit 1; }
                     ansible-galaxy collection install -r collections/requirements.yml
 
                     echo "🚀 Deploying Healthify stack with tag ${IMAGE_TAG}..."
