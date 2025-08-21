@@ -34,7 +34,7 @@ pipeline {
         stage('Preflight: Node Prep') {
     steps {
         sh '''
-            ansible-playbook -i ${INVENTORY} collections/prep_nodes.yml
+            ansible-playbook -i ${INVENTORY} prep_nodes.yml
         '''
     }
 }
