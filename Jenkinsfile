@@ -50,7 +50,7 @@ registry_port=${REGISTRY_PORT}"
         }
     }
 }
-
+    }
     
 
     post {
@@ -61,5 +61,4 @@ registry_port=${REGISTRY_PORT}"
             echo "❌ Deployment failed — check above logs"
         }
     }
-}
 }
