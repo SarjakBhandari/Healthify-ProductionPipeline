@@ -39,3 +39,12 @@
     - name: Display deployment output
       debug:
         var: deploy_result.stdout_lines
+    
+- name: Deploy Monitoring stack
+  hosts: all
+  tasks:
+    - name: Deploy Monitoring stack
+      command: docker stack deploy -c stack/monitoring-stack.yml monitoring
+      tags: monitoring
+
+
