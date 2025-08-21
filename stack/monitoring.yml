@@ -1,18 +1,19 @@
-version: "3.2"
+version: "3.8"
 
 services:
   prometheus:
     image: prom/prometheus:v2.51.2
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./prometheus/alert.rules.yml:/etc/prometheus/alert.rules.yml
+      - type: bind
+        source: ./prometheus/prometheus.yml
+        target: /etc/prometheus/prometheus.yml
+      - type: bind
+        source: ./prometheus/alert.rules.yml
+        target: /etc/prometheus/alert.rules.yml
     networks:
       - healthify_net
     ports:
-      - target: 9090
-        published: 9090
-        protocol: tcp
-        mode: host
+      - "9090:9090"
     deploy:
       replicas: 1
       restart_policy:
@@ -21,17 +22,14 @@ services:
   grafana:
     image: grafana/grafana:10.4.2
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
     volumes:
       - grafana_data:/var/lib/grafana
     networks:
       - healthify_net
     ports:
-      - target: 3000
-        published: 3000
-        protocol: tcp
-        mode: host
+      - "3000:3000"
     deploy:
       replicas: 1
       restart_policy:
@@ -42,10 +40,7 @@ services:
     networks:
       - healthify_net
     ports:
-      - target: 9100
-        published: 9100
-        protocol: tcp
-        mode: host
+      - "9100:9100"
     deploy:
       mode: global
       restart_policy:
@@ -58,12 +53,9 @@ services:
     networks:
       - healthify_net
     ports:
-      - target: 9187
-        published: 9187
-        protocol: tcp
-        mode: host
+      - "9187:9187"
     depends_on:
-      - postgres  # assumes Healthify stack has a service named 'postgres'
+      - postgres
     deploy:
       replicas: 1
       restart_policy:
