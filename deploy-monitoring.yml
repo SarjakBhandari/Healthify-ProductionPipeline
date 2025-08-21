@@ -14,18 +14,17 @@
       debug:
         msg: "Playbook is running from {{ playbook_dir }}"
 
+    - name: Copy monitoring.yml to manager
+      copy:
+        src: "/stack/monitoring.yml"
+        dest: /home/jenkins/monitoring-stack/monitoring.yml
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
 
-    # - name: Copy monitoring.yml to manager
-    #   copy:
-    #     src: "HealthifyProductionPipeline/stack/prometheus/monitoring.yml"
-    #     dest: /home/jenkins/monitoring-stack/monitoring.yml
-    #     owner: jenkins
-    #     group: jenkins
-    #     mode: '0644'
 
-
-    # - name: Deploy monitoring stack
-    #   shell: pwd
-    #   shell: docker stack deploy -c /home/jenkins/monitoring-stack/monitoring.yml monitoring
-    #   args:
-    #     warn: false
+    - name: Deploy monitoring stack
+      shell: pwd
+      shell: docker stack deploy -c /home/jenkins/monitoring-stack/monitoring.yml monitoring
+      args:
+        warn: false
