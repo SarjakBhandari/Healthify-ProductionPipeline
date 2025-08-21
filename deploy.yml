@@ -52,10 +52,6 @@
         group: jenkins
         mode: '0755'
 
-    - name: Show playbook directory
-      debug:
-        msg: "Playbook is running from {{ playbook_dir }}"
-
     - name: Copy monitoring.yml to manager
       copy:
         src: "./stack/monitoring.yml"

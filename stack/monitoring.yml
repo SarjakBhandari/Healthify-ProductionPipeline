@@ -4,10 +4,11 @@ services:
   prometheus:
     image: prom/prometheus:v2.51.2
     configs:
-      - source: ./prometheus/prometheus.yml
-        target: /etc/prometheus/prometheus.yml
-      - source: ./prometheus/alert.rules.yml
-        target: /etc/prometheus/alert.rules.yml
+    - source: prometheus.yml
+      target: /etc/prometheus/prometheus.yml
+    - source: alert.rules.yml
+      target: /etc/prometheus/alert.rules.yml
+
     networks:
       - healthify_net
     ports:
