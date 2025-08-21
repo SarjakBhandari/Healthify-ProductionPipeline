@@ -2,7 +2,23 @@
   hosts: manager
   become: yes
   tasks:
+    - name: Create deployment directory
+      file:
+        path: /home/jenkins/monitoring-stack
+        state: directory
+        owner: jenkins
+        group: jenkins
+        mode: '0755'
+
+    - name: Copy monitoring.yml to manager
+      copy:
+        src: stack/prometheus/monitoring.yml
+        dest: /home/jenkins/monitoring-stack/monitoring.yml
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+
     - name: Deploy monitoring stack
-      shell: docker stack deploy -c stack/prometheus/monitoring.yml monitoring
+      shell: docker stack deploy -c /home/jenkins/monitoring-stack/monitoring.yml monitoring
       args:
         warn: false
