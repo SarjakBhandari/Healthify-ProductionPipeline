@@ -1,0 +1,20 @@
+version: "3.2"
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: healthify
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - healthify_net
+
+volumes:
+  pgdata:
+
+networks:
+  healthify_net:
+    external: true

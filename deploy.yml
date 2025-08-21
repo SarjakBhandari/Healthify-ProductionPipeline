@@ -1,0 +1,23 @@
+---
+- name: Deploy Healthify Stack to Docker Swarm
+  hosts: manager
+  become: yes
+  tasks:
+    - name: Create deployment directory on manager
+      file:
+        path: /home/jenkins/healthify-stack
+        state: directory
+        owner: jenkins
+        group: jenkins
+        mode: 0755
+
+    - name: Copy stack files to manager
+      copy:
+        src: ./stack/
+        dest: /home/jenkins/healthify-stack/
+        owner: jenkins
+        group: jenkins
+        mode: 0644
+
+    - name: Deploy stack
+      shell: docker stack deploy -c /home/jenkins/healthify-stack/docker-stack.yml healthify

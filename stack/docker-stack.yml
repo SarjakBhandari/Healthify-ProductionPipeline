@@ -1,0 +1,21 @@
+version: "3.2"
+
+services:
+  postgres:
+    extends:
+      file: ./postgres.yml
+      service: postgres
+
+  backend:
+    extends:
+      file: ./backend.yml
+      service: backend
+
+  frontend:
+    extends:
+      file: ./frontend.yml
+      service: frontend
+
+networks:
+  healthify_net:
+    driver: overlay

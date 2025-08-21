@@ -1,6 +1,0 @@
----
-- name: Deploy Healthify stack from staging registry
-  hosts: swarm_manager
-  become: yes
-  roles:
-    - deploy
