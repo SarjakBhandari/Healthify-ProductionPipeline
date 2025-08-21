@@ -1,10 +1,10 @@
 pipeline {
-    agent any
+    agent { label 'ProductionENV' }
 
     parameters {
         string(name: 'IMAGE_TAG', defaultValue: 'latest', description: 'Image tag to deploy')
         string(name: 'DB_USER', defaultValue: 'postgres', description: 'Database username')
-        password(name: 'DB_PASSWORD', defaultValue: 'postgres', description: 'Database password')
+        password(name: 'DB_PASSWORD', defaultValue: 'postgres', description: 'Database password') // Masked in UI
         string(name: 'DB_NAME', defaultValue: 'healthify', description: 'Database name')
         string(name: 'POSTGRES_VERSION', defaultValue: '13', description: 'Postgres image version')
         string(name: 'POSTGRES_PORT', defaultValue: '5432', description: 'Postgres exposed port')
@@ -22,8 +22,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'git@github.com:SarjakBhandari/Healthify-ProductionPipeline.git'
+                git branch: 'main', url: 'git@github.com:SarjakBhandari/Healthify-ProductionPipeline.git'
             }
         }
 
@@ -32,16 +31,17 @@ pipeline {
                 sh """
                     echo "🚀 Deploying Healthify stack with tag ${IMAGE_TAG}..."
                     ansible-playbook -i ${INVENTORY} ${PLAYBOOK} \
-                      --extra-vars "image_tag=${IMAGE_TAG} \
-                                    DB_USER=${DB_USER} \
-                                    DB_PASSWORD=${DB_PASSWORD} \
-                                    DB_NAME=${DB_NAME} \
-                                    POSTGRES_VERSION=${POSTGRES_VERSION} \
-                                    POSTGRES_PORT=${POSTGRES_PORT} \
-                                    API_PORT=${API_PORT} \
-                                    FRONTEND_PORT=${FRONTEND_PORT} \
-                                    registry_ip=${REGISTRY_IP} \
-                                    registry_port=${REGISTRY_PORT}"
+                      --extra-vars "\
+image_tag=${IMAGE_TAG} \
+DB_USER=${DB_USER} \
+DB_PASSWORD=${DB_PASSWORD} \
+DB_NAME=${DB_NAME} \
+POSTGRES_VERSION=${POSTGRES_VERSION} \
+POSTGRES_PORT=${POSTGRES_PORT} \
+API_PORT=${API_PORT} \
+FRONTEND_PORT=${FRONTEND_PORT} \
+registry_ip=${REGISTRY_IP} \
+registry_port=${REGISTRY_PORT}"
                 """
             }
         }
