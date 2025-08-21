@@ -26,7 +26,6 @@ services:
     image: 192.168.50.4:5000/healthify-backend:latest
     environment:
       PORT: 5050
-      HOST: 0.0.0.0
       DB_HOST: postgres
       DB_USER: postgres
       DB_PASSWORD: postgres
