@@ -63,10 +63,19 @@
     - name: Copy Grafana dashboards
       copy:
         src: "./stack/prometheus/dashboards/"
-        dest: /home/jenkins/monitoring-stack/dashboards/"
+        dest: /home/jenkins/monitoring-stack/dashboards/
         owner: jenkins
         group: jenkins
         mode: '0644'
+
+    - name: Copy grafana.yml provisioning file
+      copy:
+        src: "./stack/prometheus/grafana.yml"
+        dest: /home/jenkins/monitoring-stack/grafana.yml
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+
 
     - name: Copy monitoring.yml to manager
       copy:
