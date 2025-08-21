@@ -19,7 +19,10 @@ pipeline {
             steps {
                 dir("${ANSIBLE_DIR}") {
                     sh '''
+                        set -e
                         echo ">>> Running Ansible Playbook for Swarm Deployment..."
+                        # Optional syntax check before running
+                        ansible-playbook --syntax-check -i ${INVENTORY} ${PLAYBOOK}
                         ansible-playbook -i ${INVENTORY} ${PLAYBOOK}
                     '''
                 }
