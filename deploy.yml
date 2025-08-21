@@ -9,33 +9,6 @@
         state: started
         enabled: yes
 
-- name: Initialize swarm on manager (if not already)
-  hosts: manager
-  become: yes
-  tasks:
-    - name: Initialize Docker Swarm
-      shell: docker swarm init --advertise-addr {{ ansible_host }}
-      args:
-        warn: false
-      register: swarm_init
-      failed_when: "'Error response from daemon: This node is already part of a swarm' not in swarm_init.stderr"
-
-- name: Join workers to swarm
-  hosts: workers
-  become: yes
-  tasks:
-    - name: Get join token from manager
-      shell: docker swarm join-token -q worker
-      delegate_to: 192.168.50.4
-      register: worker_token
-
-    - name: Join swarm as worker
-      shell: docker swarm join --token {{ worker_token.stdout }} 192.168.50.4:2377
-      args:
-        warn: false
-      register: join_result
-      changed_when: "'This node joined a swarm as a worker' in join_result.stdout"
-
 - name: Deploy Healthify Stack from Manager
   hosts: manager
   become: yes
