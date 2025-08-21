@@ -26,9 +26,7 @@ services:
       - grafana_data:/var/lib/grafana
       - /home/jenkins/monitoring-stack/grafana.yml:/etc/grafana/provisioning/grafana.yml
       - /home/jenkins/monitoring-stack/dashboards:/var/lib/grafana/dashboards
-    configs:
-      - source: grafana.yml
-        target: /etc/grafana/provisioning/grafana.yml
+  
     networks:
       - healthify_net
     ports:
