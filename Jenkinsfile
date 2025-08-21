@@ -62,3 +62,4 @@ registry_port=${REGISTRY_PORT}"
         }
     }
 }
+}
