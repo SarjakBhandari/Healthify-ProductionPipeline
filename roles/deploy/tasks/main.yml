@@ -3,6 +3,10 @@
   become: true
   ansible.builtin.shell: |
     set -e
+    if [ -z "{{ registry_ip }}" ] || [ -z "{{ registry_port }}" ] || [ -z "{{ image_tag }}" ]; then
+      echo "❌ One or more required variables are undefined: registry_ip, registry_port, image_tag"
+      exit 1
+    fi
     echo "Pulling image: {{ registry_ip }}:{{ registry_port }}/{{ item.name }}:{{ image_tag }}"
     docker pull {{ registry_ip }}:{{ registry_port }}/{{ item.name }}:{{ image_tag }}
   loop:
@@ -22,6 +26,10 @@
   become: true
   ansible.builtin.shell: |
     set -e
+    if [ -z "{{ app_stack_name }}" ]; then
+      echo "❌ app_stack_name is not defined"
+      exit 1
+    fi
     echo "Deploying stack: {{ app_stack_name }}"
     docker stack deploy -c /tmp/docker-compose.prod.yml {{ app_stack_name }}
   args:
