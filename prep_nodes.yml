@@ -6,54 +6,29 @@
     ansible_venv_path: "/opt/ansible-venv"
 
   tasks:
-    - name: "Initialize downgrade_python to false"
-      set_fact:
-        downgrade_python: false
-
-    - name: "Check current Python version"
-      command: python3 -c "import sys; print(sys.version_info.major, sys.version_info.minor)"
-      register: python_version_output
-      changed_when: false
-
-    - name: "Set downgrade flag if Python >= 3.12"
-      set_fact:
-        downgrade_python: true
-      when: >
-        (python_version_output.stdout.split()[0] | int == 3) and
-        (python_version_output.stdout.split()[1] | int >= 12)
-
-    - name: "Install Python {{ preferred_python_version }} if needed"
+    - name: "Install Python {{ preferred_python_version }} and dependencies"
       apt:
         name:
           - python{{ preferred_python_version }}
           - python{{ preferred_python_version }}-distutils
           - python{{ preferred_python_version }}-venv
           - python{{ preferred_python_version }}-dev
-        state: present
-      when: downgrade_python
-
-    - name: "Set python3 symlink to Python {{ preferred_python_version }}"
-      alternatives:
-        name: python3
-        path: "/usr/bin/python{{ preferred_python_version }}"
-      when: downgrade_python
-
-    - name: "Ensure base Python + pip + version support"
-      apt:
-        name:
-          - python3
           - python3-pip
-          - python3-distutils
           - python3-setuptools
           - python3-apt
         state: present
-      when: not downgrade_python
+        update_cache: yes
 
     - name: "Ensure packaging module (modern version parsing)"
       pip:
         name: packaging
         state: latest
         executable: pip3
+
+    - name: "Set python3 symlink to Python {{ preferred_python_version }}"
+      alternatives:
+        name: python3
+        path: "/usr/bin/python{{ preferred_python_version }}"
 
     - name: "Verify distutils.version availability"
       command: python3 -c "from distutils.version import StrictVersion; print('StrictVersion OK')"
@@ -64,20 +39,16 @@
       command: python{{ preferred_python_version }} -m venv {{ ansible_venv_path }}
       args:
         creates: "{{ ansible_venv_path }}"
-      when: true   
-
 
     - name: "Install Ansible in virtualenv"
       command: "{{ ansible_venv_path }}/bin/pip install ansible"
-      when: downgrade_python
 
     - name: "Show version check result"
       debug:
         msg: "{{ version_check.stdout | default('Version check failed') }}"
 
-    - name: "Summary - Python version and downgrade status"
+    - name: "Summary - Python version and venv"
       debug:
         msg: >
-          Python version: {{ python_version_output.stdout }},
-          Downgrade applied: {{ downgrade_python }},
-          Ansible venv: {{ ansible_venv_path if downgrade_python else 'System default' }}
+          Python version: {{ preferred_python_version }},
+          Ansible venv: {{ ansible_venv_path }}
