@@ -40,8 +40,6 @@ services:
       - postgres
     deploy:
       replicas: 2
-      placement:
-        constraints: [node.role == manager]
       restart_policy:
         condition: on-failure
     healthcheck:
