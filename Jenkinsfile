@@ -21,10 +21,10 @@ pipeline {
 
     stages {
         stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'git@github.com:SarjakBhandari/Healthify-ProductionPipeline.git'
-            }
-        }
+    steps {
+        git branch: 'main', url: 'https://github.com/SarjakBhandari/Healthify-ProductionPipeline.git'
+    }
+}
 
         stage('Deploy to Swarm') {
             steps {
