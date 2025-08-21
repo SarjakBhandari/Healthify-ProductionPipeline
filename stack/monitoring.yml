@@ -23,6 +23,8 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
     networks:
       - healthify_net
     ports:
@@ -30,8 +32,6 @@ services:
         published: 3000
         protocol: tcp
         mode: host
-    volumes:
-      - grafana_data:/var/lib/grafana
     deploy:
       replicas: 1
       restart_policy:
@@ -47,9 +47,31 @@ services:
         protocol: tcp
         mode: host
     deploy:
-      mode: global  # one exporter per node
+      mode: global
       restart_policy:
         condition: on-failure
 
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.47.2
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.15.0
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:postgres@postgres:5432/healthify?sslmode=disable"
+    networks:
+      - healthify_net
+    ports:
+      - target: 9187
+        published: 9187
+        protocol: tcp
+        mode: host
+    depends_on:
+      - postgres  # assumes Healthify stack has a service named 'postgres'
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  grafana_data:
+
+networks:
+  healthify_net:
+    external: true

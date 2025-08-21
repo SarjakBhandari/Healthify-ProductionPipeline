@@ -13,21 +13,21 @@
   hosts: manager
   become: yes
   tasks:
-    - name: Create deployment directory on manager
+    - name: Create Healthify deployment directory
       file:
         path: /home/jenkins/healthify-stack
         state: directory
         owner: jenkins
         group: jenkins
-        mode: 0755
+        mode: '0755'
 
-    - name: Copy stack file to manager
+    - name: Copy Healthify stack file to manager
       copy:
         src: ./stack/docker-stack.yml
         dest: /home/jenkins/healthify-stack/docker-stack.yml
         owner: jenkins
         group: jenkins
-        mode: 0644
+        mode: '0644'
 
     - name: Deploy Healthify stack
       shell: docker stack deploy -c /home/jenkins/healthify-stack/docker-stack.yml healthify
@@ -36,10 +36,58 @@
       register: deploy_result
       changed_when: "'Updating' in deploy_result.stdout or 'Creating' in deploy_result.stdout"
 
-    - name: Display deployment output
+    - name: Display Healthify deployment output
       debug:
         var: deploy_result.stdout_lines
-    
 
+- name: Deploy Monitoring Stack from Manager
+  hosts: manager
+  become: yes
+  tasks:
+    - name: Create Monitoring deployment directory
+      file:
+        path: /home/jenkins/monitoring-stack
+        state: directory
+        owner: jenkins
+        group: jenkins
+        mode: '0755'
 
+    - name: Copy monitoring.yml to manager
+      copy:
+        src: ./stack/prometheus/monitoring.yml
+        dest: /home/jenkins/monitoring-stack/monitoring.yml
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
 
+    - name: Copy prometheus.yml config
+      copy:
+        src: ./stack/prometheus/prometheus.yml
+        dest: /home/jenkins/monitoring-stack/prometheus.yml
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+
+    - name: Copy alert.rules.yml
+      copy:
+        src: ./stack/prometheus/alert.rules.yml
+        dest: /home/jenkins/monitoring-stack/alert.rules.yml
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+
+    - name: Ensure overlay network 'healthify_net' exists
+      shell: docker network inspect healthify_net || docker network create --driver overlay healthify_net
+      args:
+        warn: false
+
+    - name: Deploy Monitoring stack
+      shell: docker stack deploy -c /home/jenkins/monitoring-stack/monitoring.yml monitoring
+      args:
+        warn: false
+      register: monitoring_result
+      changed_when: "'Updating' in monitoring_result.stdout or 'Creating' in monitoring_result.stdout"
+
+    - name: Display Monitoring deployment output
+      debug:
+        var: monitoring_result.stdout_lines
