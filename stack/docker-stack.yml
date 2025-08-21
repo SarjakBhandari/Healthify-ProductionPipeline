@@ -41,14 +41,12 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
-      update_config:
-        parallelism: 1
-        delay: 10s
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:5050/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
+
 
   frontend:
     image: 192.168.50.4:5000/healthify-frontend:latest
