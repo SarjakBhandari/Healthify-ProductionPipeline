@@ -6,6 +6,10 @@
     ansible_venv_path: "/opt/ansible-venv"
 
   tasks:
+    - name: "Initialize downgrade_python to false"
+      set_fact:
+        downgrade_python: false
+
     - name: "Check current Python version"
       command: python3 -c "import sys; print(sys.version_info.major, sys.version_info.minor)"
       register: python_version_output
@@ -26,13 +30,13 @@
           - python{{ preferred_python_version }}-venv
           - python{{ preferred_python_version }}-dev
         state: present
-      when: downgrade_python | default(false)
+      when: downgrade_python
 
     - name: "Set python3 symlink to Python {{ preferred_python_version }}"
       alternatives:
         name: python3
         path: "/usr/bin/python{{ preferred_python_version }}"
-      when: downgrade_python | default(false)
+      when: downgrade_python
 
     - name: "Ensure base Python + pip + version support"
       apt:
@@ -43,7 +47,7 @@
           - python3-setuptools
           - python3-apt
         state: present
-      when: not downgrade_python | default(false)
+      when: not downgrade_python
 
     - name: "Ensure packaging module (modern version parsing)"
       pip:
@@ -60,11 +64,11 @@
       command: python{{ preferred_python_version }} -m venv {{ ansible_venv_path }}
       args:
         creates: "{{ ansible_venv_path }}"
-      when: downgrade_python | default(false)
+      when: downgrade_python
 
     - name: "Install Ansible in virtualenv"
       command: "{{ ansible_venv_path }}/bin/pip install ansible"
-      when: downgrade_python | default(false)
+      when: downgrade_python
 
     - name: "Show version check result"
       debug:
@@ -74,5 +78,5 @@
       debug:
         msg: >
           Python version: {{ python_version_output.stdout }},
-          Downgrade applied: {{ downgrade_python | default(false) }},
+          Downgrade applied: {{ downgrade_python }},
           Ansible venv: {{ ansible_venv_path if downgrade_python else 'System default' }}
