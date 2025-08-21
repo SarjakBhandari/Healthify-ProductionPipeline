@@ -12,7 +12,7 @@
 
     - name: Copy monitoring.yml to manager
       copy:
-        src: stack/prometheus/monitoring.yml
+        src: "{{ playbook_dir }}/stack/prometheus/monitoring.yml"
         dest: /home/jenkins/monitoring-stack/monitoring.yml
         owner: jenkins
         group: jenkins
