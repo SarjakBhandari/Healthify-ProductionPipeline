@@ -11,10 +11,10 @@
         group: jenkins
         mode: 0755
 
-    - name: Copy stack files to manager
+    - name: Copy stack file to manager
       copy:
-        src: ./stack/
-        dest: /home/jenkins/healthify-stack/
+        src: ./stack/docker-stack.yml
+        dest: /home/jenkins/healthify-stack/docker-stack.yml
         owner: jenkins
         group: jenkins
         mode: 0644
