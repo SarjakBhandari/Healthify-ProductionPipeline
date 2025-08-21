@@ -28,7 +28,6 @@ pipeline {
 
         stage('Deploy to Swarm') {
             steps {
-                dir('HealthifyProduction') {
                     sh """
                         echo "🚀 Deploying Healthify stack with tag ${IMAGE_TAG}..."
                         ansible-playbook -i ${INVENTORY} ${PLAYBOOK} \
