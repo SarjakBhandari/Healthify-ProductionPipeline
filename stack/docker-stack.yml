@@ -22,7 +22,7 @@ services:
       retries: 5
 
   backend:
-    image: healthify-backend:latest
+    image: 192.168.50.4:5000/healthify-backend:latest
     environment:
       PORT: 5050
       DB_HOST: postgres
@@ -53,7 +53,7 @@ services:
       retries: 5
 
   frontend:
-    image: healthify-frontend:latest
+    image: 192.168.50.4:5000/healthify-frontend:latest
     environment:
       API_BASE_URL: http://backend:5050/api
     networks:
