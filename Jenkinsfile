@@ -20,6 +20,12 @@ pipeline {
     }
 
     stages {
+        stage('Workspace Cleanup') {
+            steps {
+                cleanWs()  // Jenkins built-in step to clear the workspace
+            }
+        }
+
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/SarjakBhandari/Healthify-ProductionPipeline.git'
@@ -27,15 +33,14 @@ pipeline {
         }
 
         stage('Deploy to Swarm') {
-    steps {
-        dir('HealthifyProduction') {
-            sh '''
-                echo "📦 Installing required Ansible collections..."
-                ansible-galaxy collection install -r collections/requirements.yml
+            steps {
+                sh '''
+                    echo "📦 Installing required Ansible collections..."
+                    ansible-galaxy collection install -r collections/requirements.yml
 
-                echo "🚀 Deploying Healthify stack with tag ${IMAGE_TAG}..."
-                ansible-playbook -i ${INVENTORY} ${PLAYBOOK} \
-                  --extra-vars "\
+                    echo "🚀 Deploying Healthify stack with tag ${IMAGE_TAG}..."
+                    ansible-playbook -i ${INVENTORY} ${PLAYBOOK} \
+                      --extra-vars "\
 image_tag=${IMAGE_TAG} \
 DB_USER=${DB_USER} \
 DB_PASSWORD=${DB_PASSWORD} \
@@ -46,12 +51,10 @@ API_PORT=${API_PORT} \
 FRONTEND_PORT=${FRONTEND_PORT} \
 registry_ip=${REGISTRY_IP} \
 registry_port=${REGISTRY_PORT}"
-            '''
+                '''
+            }
         }
     }
-}
-    }
-    
 
     post {
         success {
