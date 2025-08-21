@@ -6,19 +6,19 @@
     ansible_venv_path: "/opt/ansible-venv"
 
   tasks:
-    - name: 🧪 Check current Python version
+    - name: Check current Python version
       command: python3 -c "import sys; print(sys.version_info.major, sys.version_info.minor)"
       register: python_version_output
       changed_when: false
 
-    - name: 🧠 Set downgrade flag if Python >= 3.12
+    - name: Set downgrade flag if Python >= 3.12
       set_fact:
         downgrade_python: true
       when: >
         (python_version_output.stdout.split()[0] | int == 3) and
         (python_version_output.stdout.split()[1] | int >= 12)
 
-    - name: 📦 Install Python {{ preferred_python_version }} if needed
+    - name: Install Python {{ preferred_python_version }} if needed
       apt:
         name:
           - python{{ preferred_python_version }}
@@ -28,13 +28,13 @@
         state: present
       when: downgrade_python | default(false)
 
-    - name: 🔗 Set python3 symlink to Python {{ preferred_python_version }}
+    - name: Set python3 symlink to Python {{ preferred_python_version }}
       alternatives:
         name: python3
         path: "/usr/bin/python{{ preferred_python_version }}"
       when: downgrade_python | default(false)
 
-    - name: 🛠️ Ensure base Python + pip + version support
+    - name: Ensure base Python + pip + version support
       apt:
         name:
           - python3
@@ -45,32 +45,32 @@
         state: present
       when: not downgrade_python | default(false)
 
-    - name: 📦 Ensure packaging module (modern version parsing)
+    - name: Ensure packaging module (modern version parsing)
       pip:
         name: packaging
         state: latest
         executable: pip3
 
-    - name: 🧪 Verify distutils.version availability
+    - name: Verify distutils.version availability
       command: python3 -c "from distutils.version import StrictVersion; print('StrictVersion OK')"
       register: version_check
       ignore_errors: true
 
-    - name: 🐍 Create Python {{ preferred_python_version }} virtualenv for Ansible
+    - name: Create Python {{ preferred_python_version }} virtualenv for Ansible
       command: python{{ preferred_python_version }} -m venv {{ ansible_venv_path }}
       args:
         creates: "{{ ansible_venv_path }}"
       when: downgrade_python | default(false)
 
-    - name: 📥 Install Ansible in virtualenv
+    - name: Install Ansible in virtualenv
       command: "{{ ansible_venv_path }}/bin/pip install ansible"
       when: downgrade_python | default(false)
 
-    - name: 📋 Show version check result
+    - name: Show version check result
       debug:
         msg: "{{ version_check.stdout | default('Version check failed') }}"
 
-    - name: 🧾 Summary: Python version and downgrade status
+    - name: Summary: Python version and downgrade status
       debug:
         msg: >
           Python version: {{ python_version_output.stdout }},
