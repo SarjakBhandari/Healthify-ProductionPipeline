@@ -27,11 +27,15 @@ pipeline {
         }
 
         stage('Deploy to Swarm') {
-            steps {
-                    sh """
-                        echo "🚀 Deploying Healthify stack with tag ${IMAGE_TAG}..."
-                        ansible-playbook -i ${INVENTORY} ${PLAYBOOK} \
-                          --extra-vars "\
+    steps {
+        dir('HealthifyProduction') {
+            sh '''
+                echo "📦 Installing required Ansible collections..."
+                ansible-galaxy collection install -r collections/requirements.yml
+
+                echo "🚀 Deploying Healthify stack with tag ${IMAGE_TAG}..."
+                ansible-playbook -i ${INVENTORY} ${PLAYBOOK} \
+                  --extra-vars "\
 image_tag=${IMAGE_TAG} \
 DB_USER=${DB_USER} \
 DB_PASSWORD=${DB_PASSWORD} \
@@ -42,10 +46,11 @@ API_PORT=${API_PORT} \
 FRONTEND_PORT=${FRONTEND_PORT} \
 registry_ip=${REGISTRY_IP} \
 registry_port=${REGISTRY_PORT}"
-                    """
-                }
-            }
+            '''
         }
+    }
+}
+
     
 
     post {
