@@ -64,7 +64,8 @@
       command: python{{ preferred_python_version }} -m venv {{ ansible_venv_path }}
       args:
         creates: "{{ ansible_venv_path }}"
-      when: downgrade_python
+      when: true   
+
 
     - name: "Install Ansible in virtualenv"
       command: "{{ ansible_venv_path }}/bin/pip install ansible"
