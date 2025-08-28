@@ -13,6 +13,21 @@
   hosts: manager
   become: yes
   tasks:
+    - name: Remove existing Healthify stack (if any)
+      shell: docker stack rm healthify || true
+      args:
+        executable: /bin/bash
+      ignore_errors: true
+
+    - name: Wait for Healthify stack removal to complete
+      shell: |
+        while docker stack services healthify 2>/dev/null | grep -q .; do
+          echo "Waiting for Healthify stack to be removed..."
+          sleep 2
+        done
+      args:
+        executable: /bin/bash
+
     - name: Create Healthify deployment directory
       file:
         path: /home/jenkins/healthify-stack
@@ -39,6 +54,7 @@
     - name: Display Healthify deployment output
       debug:
         var: deploy_result.stdout_lines
+
 
 - name: Deploy Monitoring Stack with Config Overwrite
   hosts: manager
