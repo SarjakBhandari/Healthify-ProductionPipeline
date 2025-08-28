@@ -43,6 +43,11 @@
         owner: jenkins
         group: jenkins
         mode: '0644'
+    - name: Create external network healthify_net if not exists
+      shell: docker network create --driver overlay healthify_net || true
+      args:
+        executable: /bin/bash
+      ignore_errors: true
 
     - name: Deploy Healthify stack
       shell: docker stack deploy -c /home/jenkins/healthify-stack/docker-stack.yml healthify
