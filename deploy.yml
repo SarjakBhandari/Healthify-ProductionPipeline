@@ -58,50 +58,6 @@
       when: all_images | length > 0
       ignore_errors: yes
 
-- name: Deploy Healthify Stack from Manager
-  hosts: manager
-  become: yes
-  tasks:
-    - name: Create Healthify deployment directory
-      file:
-        path: /home/jenkins/healthify-stack
-        state: directory
-        owner: jenkins
-        group: jenkins
-        mode: '0755'
-
-    - name: Copy Healthify stack file to manager
-      copy:
-        src: ./stack/docker-stack.yml
-        dest: /home/jenkins/healthify-stack/docker-stack.yml
-        owner: jenkins
-        group: jenkins
-        mode: '0644'
-        force: yes
-
-    - name: Create external network healthify_net if not exists
-      shell: docker network create --driver overlay healthify_net || true
-      args:
-        executable: /bin/bash
-      ignore_errors: true
-
-    - name: Ensure external volume pgdata exists
-      shell: docker volume create pgdata || true
-      args:
-        executable: /bin/bash
-      ignore_errors: true
-
-    - name: Deploy Healthify stack
-      shell: docker stack deploy -c /home/jenkins/healthify-stack/docker-stack.yml healthify
-      args:
-        warn: false
-      register: deploy_result
-      changed_when: "'Updating' in deploy_result.stdout or 'Creating' in deploy_result.stdout"
-
-    - name: Display Healthify deployment output
-      debug:
-        var: deploy_result.stdout_lines
-
 - name: Deploy Monitoring Stack
   hosts: manager
   become: yes
@@ -158,6 +114,22 @@
         group: jenkins
         mode: '0644'
 
+    - name: Archive Grafana dashboards into all_dashboards.tar.gz
+      archive:
+        path: /home/jenkins/monitoring-stack/dashboards/json/
+        dest: /home/jenkins/monitoring-stack/dashboards/json/all_dashboards.tar.gz
+        format: gz
+
+    - name: Verify dashboard archive exists
+      stat:
+        path: /home/jenkins/monitoring-stack/dashboards/json/all_dashboards.tar.gz
+      register: dashboard_archive
+
+    - name: Fail if dashboard archive is missing
+      fail:
+        msg: "Dashboard archive all_dashboards.tar.gz is missing. Cannot deploy monitoring stack."
+      when: not dashboard_archive.stat.exists
+
     - name: Copy Prometheus config
       copy:
         src: /tmp/healthify-stack/stack/prometheus/prometheus.yml
@@ -182,7 +154,6 @@
         group: jenkins
         mode: '0644'
         remote_src: yes
-
 
     - name: Remove monitoring stack
       shell: docker stack rm monitoring || true
