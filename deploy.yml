@@ -27,6 +27,37 @@
         done
       args:
         executable: /bin/bash
+    
+    - name: Remove Healthify Docker images from local registry
+  hosts: localhost
+  gather_facts: no
+  tasks:
+
+    - name: Get image IDs for healthify-frontend
+      shell: |
+        docker images --format '{{.Repository}} {{.ID}}' | \
+        grep '192.168.50.4:5000/healthify-frontend' | \
+        awk '{print $2}'
+      register: frontend_images
+      changed_when: false
+
+    - name: Get image IDs for healthify-backend
+      shell: |
+        docker images --format '{{.Repository}} {{.ID}}' | \
+        grep '192.168.50.4:5000/healthify-backend' | \
+        awk '{print $2}'
+      register: backend_images
+      changed_when: false
+
+    - name: Combine image IDs
+      set_fact:
+        all_images: "{{ frontend_images.stdout_lines + backend_images.stdout_lines }}"
+
+    - name: Remove Healthify images
+      shell: docker rmi -f {{ item }}
+      loop: "{{ all_images }}"
+      when: all_images | length > 0
+      ignore_errors: yes
 
     - name: Create Healthify deployment directory
       file:
