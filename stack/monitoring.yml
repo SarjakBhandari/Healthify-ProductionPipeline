@@ -94,4 +94,7 @@ configs:
     external: true
   alert.rules.yml:
     external: true
-
+  grafana-datasource:
+    external: true
+  grafana-dashboard:
+    external: true
