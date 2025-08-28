@@ -9,13 +9,28 @@
         state: started
         enabled: yes
 
-- name: Remove Healthify Docker images from local registry
+- name: Stop Healthify Stack and Remove Images
   hosts: manager
   become: yes
   tasks:
+    - name: Remove existing Healthify stack (if any)
+      shell: docker stack rm healthify || true
+      args:
+        executable: /bin/bash
+      ignore_errors: true
+
+    - name: Wait for Healthify stack removal to complete
+      shell: |
+        while docker stack services healthify 2>/dev/null | grep -q .; do
+          echo "Waiting for Healthify stack to be removed..."
+          sleep 2
+        done
+      args:
+        executable: /bin/bash
+
     - name: Get image IDs for healthify-frontend
       shell: |
-        docker images --format '{% raw %}{{.Repository}} {{.ID}}{% endraw %}' | \
+        docker images --format '{{.Repository}} {{.ID}}' | \
         grep '192.168.50.4:5000/healthify-frontend' | \
         awk '{print $2}'
       register: frontend_images
@@ -23,7 +38,7 @@
 
     - name: Get image IDs for healthify-backend
       shell: |
-        docker images --format '{% raw %}{{.Repository}} {{.ID}}{% endraw %}' | \
+        docker images --format '{{.Repository}} {{.ID}}' | \
         grep '192.168.50.4:5000/healthify-backend' | \
         awk '{print $2}'
       register: backend_images
@@ -38,6 +53,7 @@
       loop: "{{ all_images }}"
       when: all_images | length > 0
       ignore_errors: yes
+
 
 - name: Deploy Healthify Stack from Manager
   hosts: manager
