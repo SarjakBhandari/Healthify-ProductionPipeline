@@ -128,12 +128,15 @@
 
     - name: Get failed tasks for Healthify services
       shell: |
+        {% raw %}
         docker service ls --format '{{.Name}}' | grep healthify | while read svc; do
           echo "Service: $svc"
           docker service ps $svc --no-trunc | grep -E 'Failed|Rejected|Shutdown'
         done
+        {% endraw %}
       register: failed_tasks
       changed_when: false
+
 
     - name: Show failed task details
       debug:
