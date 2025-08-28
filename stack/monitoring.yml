@@ -24,7 +24,7 @@ services:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
     configs:
-      - source: grafana-datasource
+      - source: datasource
         target: /etc/grafana/provisioning/datasources/prometheus.yml
       - source: grafana-dashboard
         target: /etc/grafana/provisioning/dashboards/grafana.yml
@@ -96,7 +96,7 @@ configs:
     external: true
   alert.rules.yml:
     external: true
-  grafana-datasource:
+  datasource:
     external: true
   grafana-dashboard:
     external: true

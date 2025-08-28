@@ -90,7 +90,7 @@
     - name: Recreate Grafana datasource config
       shell: |
         docker config rm grafana-datasource || true
-        docker config create grafana-datasource /home/jenkins/monitoring-stack/prometheus-datasource.yml
+        docker config create datasource /home/jenkins/monitoring-stack/prometheus-datasource.yml
       args:
         executable: /bin/bash
       ignore_errors: true
