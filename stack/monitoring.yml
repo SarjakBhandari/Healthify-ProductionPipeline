@@ -94,7 +94,7 @@ configs:
   prometheus_datasource:
     file: /home/jenkins/monitoring-stack/prometheus-datasource.yml
   grafana_dashboard_config:
-    file: /home/jenkins/monitoring-stack/dashboards/grafana.yml
+    file: /home/jenkins/monitoring-stack/grafana.yml
 
 networks:
   healthify_net:
