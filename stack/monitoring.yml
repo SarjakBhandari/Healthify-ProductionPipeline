@@ -25,15 +25,12 @@ services:
       GF_PATHS_PROVISIONING: /etc/grafana/provisioning
     volumes:
       - grafana_data:/var/lib/grafana
-      - dashboards:/var/lib/grafana/dashboards
+      - /home/jenkins/monitoring-stack/dashboards/json:/etc/grafana/dashboards/json
     configs:
       - source: prometheus_datasource
         target: /etc/grafana/provisioning/datasources/prometheus.yml
       - source: grafana_dashboard_config
         target: /etc/grafana/provisioning/dashboards/grafana.yml
-    secrets:
-      - source: dashboard_jsons
-        target: /var/lib/grafana/dashboards/json
     networks:
       - healthify_net
     ports:
@@ -88,7 +85,6 @@ services:
 
 volumes:
   grafana_data:
-  dashboards:
 
 configs:
   prometheus_config:
@@ -98,11 +94,7 @@ configs:
   prometheus_datasource:
     file: /home/jenkins/monitoring-stack/prometheus-datasource.yml
   grafana_dashboard_config:
-    file: /home/jenkins/monitoring-stack/grafana-dashboard.yml
-
-secrets:
-  dashboard_jsons:
-    file: /home/jenkins/monitoring-stack/dashboards/json/all_dashboards.tar.gz
+    file: /home/jenkins/monitoring-stack/dashboards/grafana.yml
 
 networks:
   healthify_net:
