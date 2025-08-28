@@ -107,4 +107,3 @@
       debug:
         var: deploy_result.stdout_lines
 
-- import_playbook: monitor.yml
