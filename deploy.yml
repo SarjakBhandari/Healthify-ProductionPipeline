@@ -194,18 +194,18 @@
       shell: docker config create alert.rules.yml /home/jenkins/monitoring-stack/alert.rules.yml
 
     - name: Remove existing Grafana datasource config
-      shell: docker config rm prometheus-datasource.yml || true
+      shell: docker config rm grafana-datasource || true
       ignore_errors: true
 
     - name: Create fresh Grafana datasource config
-      shell: docker config create prometheus-datasource.yml /home/jenkins/monitoring-stack/prometheus-datasource.yml
+      shell: docker config create grafana-datasource /home/jenkins/monitoring-stack/prometheus-datasource.yml
 
     - name: Remove existing Grafana dashboard config
-      shell: docker config rm grafana-dashboard.yml || true
+      shell: docker config rm grafana-dashboard || true
       ignore_errors: true
 
     - name: Create fresh Grafana dashboard config
-      shell: docker config create grafana-dashboard.yml /home/jenkins/monitoring-stack/grafana-dashboard.yml
+      shell: docker config create grafana-dashboard /home/jenkins/monitoring-stack/grafana-dashboard.yml
 
     - name: Deploy monitoring stack
       shell: docker stack deploy -c /home/jenkins/monitoring-stack/monitoring.yml monitoring
