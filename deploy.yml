@@ -158,22 +158,6 @@
         group: jenkins
         mode: '0644'
 
-    - name: Archive Grafana dashboards into all_dashboards.tar.gz
-      archive:
-        path: /home/jenkins/monitoring-stack/dashboards/json/
-        dest: /home/jenkins/monitoring-stack/dashboards/json/all_dashboards.tar.gz
-        format: gz
-
-    - name: Verify dashboard archive exists
-      stat:
-        path: /home/jenkins/monitoring-stack/dashboards/json/all_dashboards.tar.gz
-      register: dashboard_archive
-
-    - name: Fail if dashboard archive is missing
-      fail:
-        msg: "Dashboard archive all_dashboards.tar.gz is missing. Cannot deploy monitoring stack."
-      when: not dashboard_archive.stat.exists
-
     - name: Copy Prometheus config
       copy:
         src: /tmp/healthify-stack/stack/prometheus/prometheus.yml
