@@ -176,7 +176,7 @@
 
     - name: Copy monitoring stack file
       copy:
-        src: /tmp/healthify-stack/stack/prometheus/monitoring.yml
+        src: /tmp/healthify-stack/stack/monitoring.yml
         dest: /home/jenkins/monitoring-stack/monitoring.yml
         owner: jenkins
         group: jenkins
