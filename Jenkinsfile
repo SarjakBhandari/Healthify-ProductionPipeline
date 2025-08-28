@@ -15,19 +15,27 @@ pipeline {
             }
         }
 
-        stage('Deploy Healthify & Monitoring Stack') {
-            steps {
-                dir("${ANSIBLE_DIR}") {
-                    sh '''
-                        set -e
-                        echo ">>> Running Ansible Playbook for Swarm Deployment..."
-                        ansible-playbook --syntax-check -i ${INVENTORY} ${PLAYBOOK}
-                        ansible-playbook -i ${INVENTORY} ${PLAYBOOK}
-                    '''
-                }
+    stage('Deploy Healthify & Monitoring Stack') {
+        steps {
+            dir("${ANSIBLE_DIR}") {
+                sh '''
+                    set -e
+                    echo ">>> Running Ansible Playbook for Swarm Deployment..."
+                    ansible-playbook --syntax-check -i ${INVENTORY} ${PLAYBOOK}
+                    ansible-playbook -i ${INVENTORY} ${PLAYBOOK}
+                    
+                    if [ "${DEPLOY_MONITORING}" = "true" ]; then
+                        echo ">>> Deploying Monitoring Stack..."
+                        ansible-playbook --syntax-check -i ${INVENTORY} monitor.yml
+                        ansible-playbook -i ${INVENTORY} monitor.yml
+                    else
+                        echo ">>> Skipping Monitoring Stack Deployment."
+                    fi
+                '''
             }
         }
     }
+
 
     post {
         success {
