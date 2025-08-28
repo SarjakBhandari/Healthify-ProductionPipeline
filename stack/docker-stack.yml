@@ -1,4 +1,4 @@
-version: "3.2"
+version: "3.8"  # Upgrade for better Swarm compatibility
 
 services:
   postgres:
@@ -17,12 +17,14 @@ services:
         condition: on-failure
       placement:
         constraints:
-          - node.role == manager  # Postgres runs only on manager
+          - node.role == manager
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 30s
       timeout: 10s
       retries: 5
+    logging:
+      driver: json-file
 
   backend:
     image: 192.168.50.4:5000/healthify-backend:latest
@@ -36,39 +38,33 @@ services:
       EXPIRES_IN: 24h
     networks:
       - healthify_net
-    depends_on:
-      - postgres
     deploy:
       replicas: 2
       restart_policy:
         condition: on-failure
-      placement:
-        constraints: []  # can run on any node
     ports:
       - target: 5050
         published: 5050
         protocol: tcp
-        mode: host  # published on all nodes
+        mode: ingress  # ✅ Changed from host to ingress
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:5050/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
+    logging:
+      driver: json-file
 
   frontend:
     image: 192.168.50.4:5000/healthify-frontend:latest
     environment:
-      API_BASE_URL: http://192.168.50.4:5050/api
+      API_BASE_URL: http://backend:5050/api  # ✅ Use internal DNS name
     networks:
       - healthify_net
-    depends_on:
-      - backend
     deploy:
       replicas: 2
       restart_policy:
         condition: on-failure
-      placement:
-        constraints: []  # can run on any node
       update_config:
         parallelism: 1
         delay: 10s
@@ -76,12 +72,14 @@ services:
       - target: 5173
         published: 5173
         protocol: tcp
-        mode: host  # published on all nodes
+        mode: ingress  # ✅ Changed from host to ingress
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:5173 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
+    logging:
+      driver: json-file
 
 volumes:
   pgdata:
@@ -89,5 +87,4 @@ volumes:
 
 networks:
   healthify_net:
-    driver: overlay
     external: true
