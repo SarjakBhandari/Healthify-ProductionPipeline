@@ -30,7 +30,7 @@
 
     - name: Get image IDs for healthify-frontend
       shell: |
-        docker images --format '{{.Repository}} {{.ID}}' | \
+        docker images --format '{% raw %}{{.Repository}} {{.ID}}{% endraw %}' | \
         grep '192.168.50.4:5000/healthify-frontend' | \
         awk '{print $2}'
       register: frontend_images
@@ -38,7 +38,7 @@
 
     - name: Get image IDs for healthify-backend
       shell: |
-        docker images --format '{{.Repository}} {{.ID}}' | \
+        docker images --format '{% raw %}{{.Repository}} {{.ID}}{% endraw %}' | \
         grep '192.168.50.4:5000/healthify-backend' | \
         awk '{print $2}'
       register: backend_images
