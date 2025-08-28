@@ -27,45 +27,7 @@ pipeline {
             }
         }
     }
-     stage('Confirm Monitoring Deployment') {
-        steps {
-            script {
-                def deployMonitoring = input(
-                    id: 'monitoringConfirm',
-                    message: 'Do you want to deploy the Prometheus & Grafana monitoring stack?',
-                    parameters: [
-                        choice(name: 'Deploy', choices: ['Yes', 'No'], description: 'Select Yes to proceed with monitoring deployment')
-                    ]
-                )
-
-                if (deployMonitoring == 'No') {
-                    env.SKIP_MONITORING = 'true'
-                } else {
-                    env.SKIP_MONITORING = 'false'
-                }
-            }
-        }
-    }
-
-    stage('Deploy Monitoring Stack') {
-        steps {
-            dir("${ANSIBLE_DIR}") {
-                sh '''
-                    set -e
-    
-                    if [ "${SKIP_MONITORING}" = "false" ]; then
-                        echo ">>> Deploying Monitoring Stack..."
-                        ansible-playbook --syntax-check -i ${INVENTORY} monitor.yml
-                        ansible-playbook -i ${INVENTORY} monitor.yml
-                    else
-                        echo ">>> Skipping Monitoring Stack Deployment."
-                    fi
-                '''
-            }
-        }
-    }
-}
-    
+    }  
 
 
 

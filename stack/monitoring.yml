@@ -1,14 +1,11 @@
----
 version: "3.8"
 
 services:
   prometheus:
     image: prom/prometheus:v2.51.2
-    configs:
-      - source: prometheus.yml
-        target: /etc/prometheus/prometheus.yml
-      - source: alert.rules.yml
-        target: /etc/prometheus/alert.rules.yml
+    volumes:
+      - /home/jenkins/monitoring-stack/prometheus.yml:/etc/prometheus/prometheus.yml
+      - /home/jenkins/monitoring-stack/alert.rules.yml:/etc/prometheus/alert.rules.yml
     networks:
       - healthify_net
     ports:
@@ -23,14 +20,12 @@ services:
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
-    configs:
-      - source: datasource
-        target: /etc/grafana/provisioning/datasources/prometheus.yml
-      - source: grafana-dashboard
-        target: /etc/grafana/provisioning/dashboards/grafana.yml
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
     volumes:
       - grafana_data:/var/lib/grafana
       - dashboards:/var/lib/grafana/dashboards
+      - /home/jenkins/monitoring-stack/prometheus-datasource.yml:/etc/grafana/provisioning/datasources/prometheus.yml
+      - /home/jenkins/monitoring-stack/grafana-dashboard.yml:/etc/grafana/provisioning/dashboards/grafana.yml
     networks:
       - healthify_net
     ports:
@@ -89,14 +84,4 @@ volumes:
 
 networks:
   healthify_net:
-    external: true
-
-configs:
-  prometheus.yml:
-    external: true
-  alert.rules.yml:
-    external: true
-  datasource:
-    external: true
-  grafana-dashboard:
     external: true

@@ -1,11 +1,11 @@
 groups:
   - name: healthify-alerts
     rules:
-      - alert: InstanceDown
-        expr: up == 0
+      - alert: NodeDown
+        expr: up{job="node-exporter"} == 0
         for: 1m
         labels:
           severity: critical
         annotations:
-          summary: "Instance {{ $labels.instance }} is down"
-          description: "The instance {{ $labels.instance }} in job {{ $labels.job }} has been unreachable for more than 1 minute."
+          summary: "Node exporter is down"
+          description: "Node exporter has not responded for 1 minute."

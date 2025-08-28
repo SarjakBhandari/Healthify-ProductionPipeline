@@ -101,3 +101,89 @@
     - name: Display Healthify deployment output
       debug:
         var: deploy_result.stdout_lines
+
+- name: Deploy Monitoring Stack
+  hosts: manager
+  become: yes
+  tasks:
+    - name: Create monitoring deployment directory
+      file:
+        path: /home/jenkins/monitoring-stack
+        state: directory
+        owner: jenkins
+        group: jenkins
+        mode: '0755'
+
+    - name: Ensure Grafana dashboard JSON directory exists
+      file:
+        path: /home/jenkins/monitoring-stack/dashboards/json
+        state: directory
+        owner: jenkins
+        group: jenkins
+        mode: '0755'
+
+    - name: Copy Grafana datasource provisioning file
+      copy:
+        src: "./stack/grafana/datasources/prometheus.yml"
+        dest: "/home/jenkins/monitoring-stack/prometheus-datasource.yml"
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+
+    - name: Copy Grafana dashboard provisioning config
+      copy:
+        src: "./stack/grafana/dashboards/grafana.yml"
+        dest: "/home/jenkins/monitoring-stack/grafana-dashboard.yml"
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+
+    - name: Copy Grafana dashboard JSONs
+      copy:
+        src: "./stack/grafana/dashboards/json/"
+        dest: "/home/jenkins/monitoring-stack/dashboards/json/"
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+
+    - name: Copy Prometheus config
+      copy:
+        src: "./stack/prometheus/prometheus.yml"
+        dest: "/home/jenkins/monitoring-stack/prometheus.yml"
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+
+    - name: Copy Prometheus alert rules
+      copy:
+        src: "./stack/prometheus/alert.rules.yml"
+        dest: "/home/jenkins/monitoring-stack/alert.rules.yml"
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+
+    - name: Remove monitoring stack
+      shell: docker stack rm monitoring || true
+      args:
+        executable: /bin/bash
+      ignore_errors: true
+
+    - name: Wait for monitoring stack removal
+      shell: |
+        while docker stack services monitoring 2>/dev/null | grep -q .; do
+          echo "Waiting for monitoring stack to be removed..."
+          sleep 5
+        done
+      args:
+        executable: /bin/bash
+
+    - name: Deploy monitoring stack
+      shell: docker stack deploy -c /home/jenkins/monitoring-stack/monitoring.yml monitoring
+      args:
+        warn: false
+      register: monitoring_result
+      changed_when: "'Updating' in monitoring_result.stdout or 'Creating' in monitoring_result.stdout"
+
+    - name: Display monitoring deployment output
+      debug:
+        var: monitoring_result.stdout_lines
