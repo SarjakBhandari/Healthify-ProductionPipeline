@@ -52,30 +52,29 @@
         group: jenkins
         mode: '0755'
 
-    - name: Copy grafana.yml provisioning file
+    - name: Copy Grafana datasource provisioning file
       copy:
-        src: "./stack/prometheus/grafana.yml"
-        dest: /home/jenkins/monitoring-stack/grafana.yml
+        src: "./stack/grafana/datasources/prometheus.yml"
+        dest: /home/jenkins/monitoring-stack/prometheus-datasource.yml
         owner: jenkins
         group: jenkins
         mode: '0644'
 
-    - name: Copy Grafana dashboards
+    - name: Copy Grafana dashboard provisioning file
       copy:
-        src: "./stack/prometheus/dashboards/"
-        dest: /home/jenkins/monitoring-stack/dashboards/
+        src: "./stack/grafana/dashboards/grafana.yml"
+        dest: /home/jenkins/monitoring-stack/grafana-dashboard.yml
         owner: jenkins
         group: jenkins
         mode: '0644'
 
-    - name: Copy grafana.yml provisioning file
+    - name: Copy Grafana dashboard JSONs
       copy:
-        src: "./stack/prometheus/grafana.yml"
-        dest: /home/jenkins/monitoring-stack/grafana.yml
+        src: "./stack/grafana/dashboards/json/"
+        dest: /home/jenkins/monitoring-stack/dashboards/json/
         owner: jenkins
         group: jenkins
         mode: '0644'
-
 
     - name: Copy monitoring.yml to manager
       copy:
@@ -85,7 +84,7 @@
         group: jenkins
         mode: '0644'
 
-    - name: Copy prometheus.yml config to manager
+    - name: Copy Prometheus config
       copy:
         src: "./stack/prometheus/prometheus.yml"
         dest: /home/jenkins/monitoring-stack/prometheus.yml
@@ -93,7 +92,7 @@
         group: jenkins
         mode: '0644'
 
-    - name: Copy alert.rules.yml config to manager
+    - name: Copy Alert rules config
       copy:
         src: "./stack/prometheus/alert.rules.yml"
         dest: /home/jenkins/monitoring-stack/alert.rules.yml
@@ -115,39 +114,33 @@
 
     - name: Remove existing Prometheus config
       shell: docker config rm prometheus.yml || true
-      args:
-        executable: /bin/bash
       ignore_errors: true
 
     - name: Create fresh Prometheus config
       shell: docker config create prometheus.yml /home/jenkins/monitoring-stack/prometheus.yml
-      args:
-        executable: /bin/bash
 
     - name: Remove existing Alert rules config
       shell: docker config rm alert.rules.yml || true
-      args:
-        executable: /bin/bash
       ignore_errors: true
 
     - name: Create fresh Alert rules config
       shell: docker config create alert.rules.yml /home/jenkins/monitoring-stack/alert.rules.yml
-      args:
-        executable: /bin/bash
 
-    - name: Remove existing Grafana provisioning config
-      shell: docker config rm grafana.yml || true
-      args:
-        executable: /bin/bash
+    - name: Remove existing Grafana datasource config
+      shell: docker config rm prometheus-datasource.yml || true
       ignore_errors: true
 
-    - name: Create fresh Grafana provisioning config
-      shell: docker config create grafana.yml /home/jenkins/monitoring-stack/grafana.yml
-      args:
-        executable: /bin/bash
+    - name: Create fresh Grafana datasource config
+      shell: docker config create prometheus-datasource.yml /home/jenkins/monitoring-stack/prometheus-datasource.yml
+
+    - name: Remove existing Grafana dashboard config
+      shell: docker config rm grafana-dashboard.yml || true
+      ignore_errors: true
+
+    - name: Create fresh Grafana dashboard config
+      shell: docker config create grafana-dashboard.yml /home/jenkins/monitoring-stack/grafana-dashboard.yml
 
     - name: Deploy monitoring stack
       shell: docker stack deploy -c /home/jenkins/monitoring-stack/monitoring.yml monitoring
       args:
-        executable: /bin/bash
         warn: false

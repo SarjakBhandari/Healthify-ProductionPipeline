@@ -22,12 +22,14 @@ services:
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
+    configs:
+      - source: grafana-datasource
+        target: /etc/grafana/provisioning/datasources/prometheus.yml
+      - source: grafana-dashboard
+        target: /etc/grafana/provisioning/dashboards/grafana.yml
     volumes:
       - grafana_data:/var/lib/grafana
-      - /home/jenkins/monitoring-stack/grafana.yml:/etc/grafana/provisioning/grafana.yml
-      - /home/jenkins/monitoring-stack/grafana.yml:/etc/grafana/provisioning/dashboards/grafana.yml
-
-  
+      - dashboards:/var/lib/grafana/dashboards
     networks:
       - healthify_net
     ports:
@@ -36,6 +38,7 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+
 
   node-exporter:
     image: prom/node-exporter:v1.7.0
