@@ -29,9 +29,9 @@
         executable: /bin/bash
     
     - name: Remove Healthify Docker images from local registry
-  hosts: localhost
-  gather_facts: no
-  tasks:
+      hosts: localhost
+      gather_facts: no
+      tasks:
 
     - name: Get image IDs for healthify-frontend
       shell: |
