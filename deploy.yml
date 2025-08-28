@@ -9,30 +9,10 @@
         state: started
         enabled: yes
 
-- name: Deploy Healthify Stack from Manager
+- name: Remove Healthify Docker images from local registry
   hosts: manager
   become: yes
   tasks:
-    - name: Remove existing Healthify stack (if any)
-      shell: docker stack rm healthify || true
-      args:
-        executable: /bin/bash
-      ignore_errors: true
-
-    - name: Wait for Healthify stack removal to complete
-      shell: |
-        while docker stack services healthify 2>/dev/null | grep -q .; do
-          echo "Waiting for Healthify stack to be removed..."
-          sleep 2
-        done
-      args:
-        executable: /bin/bash
-    
-    - name: Remove Healthify Docker images from local registry
-      hosts: localhost
-      gather_facts: no
-      tasks:
-
     - name: Get image IDs for healthify-frontend
       shell: |
         docker images --format '{{.Repository}} {{.ID}}' | \
@@ -59,6 +39,25 @@
       when: all_images | length > 0
       ignore_errors: yes
 
+- name: Deploy Healthify Stack from Manager
+  hosts: manager
+  become: yes
+  tasks:
+    - name: Remove existing Healthify stack (if any)
+      shell: docker stack rm healthify || true
+      args:
+        executable: /bin/bash
+      ignore_errors: true
+
+    - name: Wait for Healthify stack removal to complete
+      shell: |
+        while docker stack services healthify 2>/dev/null | grep -q .; do
+          echo "Waiting for Healthify stack to be removed..."
+          sleep 2
+        done
+      args:
+        executable: /bin/bash
+
     - name: Create Healthify deployment directory
       file:
         path: /home/jenkins/healthify-stack
@@ -74,6 +73,7 @@
         owner: jenkins
         group: jenkins
         mode: '0644'
+
     - name: Create external network healthify_net if not exists
       shell: docker network create --driver overlay healthify_net || true
       args:
@@ -90,7 +90,6 @@
     - name: Display Healthify deployment output
       debug:
         var: deploy_result.stdout_lines
-
 
 - name: Deploy Monitoring Stack with Config Overwrite
   hosts: manager
