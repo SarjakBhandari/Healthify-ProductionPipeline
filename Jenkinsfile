@@ -35,13 +35,15 @@ pipeline {
             }
         }
     }
+    }
+
 
 
     post {
         success {
             mail to: 'sarjakytdfiles@gmail.com',
                  subject: 'HEALTHIFY + MONITORING DEPLOYMENT SUCCESS',
-                 body: """Deployment succeeded ✅
+                 body: """Deployment succeeded
 
 App: http://192.168.50.4:5173  
 API: http://192.168.50.4:5050  
@@ -56,7 +58,7 @@ Build URL: ${BUILD_URL}"""
         failure {
             mail to: 'sarjakytdfiles@gmail.com',
                  subject: 'HEALTHIFY + MONITORING DEPLOYMENT FAILURE',
-                 body: """Deployment failed ❌  
+                 body: """Deployment failed 
 Check Jenkins logs: ${BUILD_URL}"""
         }
     }
