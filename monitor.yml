@@ -89,7 +89,7 @@
 
     - name: Recreate Grafana datasource config
       shell: |
-        docker config rm grafana-datasource || true
+        docker config rm datasource 
         docker config create datasource /home/jenkins/monitoring-stack/prometheus-datasource.yml
       args:
         executable: /bin/bash
@@ -97,7 +97,7 @@
 
     - name: Recreate Grafana dashboard config
       shell: |
-        docker config rm grafana-dashboard || true
+        docker config rm grafana-dashboard
         docker config create grafana-dashboard /home/jenkins/monitoring-stack/grafana-dashboard.yml
       args:
         executable: /bin/bash
