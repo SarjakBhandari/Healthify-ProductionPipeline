@@ -181,6 +181,8 @@
         owner: jenkins
         group: jenkins
         mode: '0644'
+        remote_src: yes
+
 
     - name: Remove monitoring stack
       shell: docker stack rm monitoring || true
