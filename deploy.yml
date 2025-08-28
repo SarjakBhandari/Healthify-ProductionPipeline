@@ -14,7 +14,7 @@
   become: yes
   tasks:
     - name: Remove existing Healthify stack (if any)
-      shell: docker stack rm healthify || true
+      shell: docker stack rm healthify 
       args:
         executable: /bin/bash
       ignore_errors: true
@@ -23,7 +23,7 @@
       shell: |
         while docker stack services healthify 2>/dev/null | grep -q .; do
           echo "Waiting for Healthify stack to be removed..."
-          sleep 5
+          sleep 10
         done
       args:
         executable: /bin/bash
