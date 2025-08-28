@@ -106,6 +106,18 @@
   hosts: manager
   become: yes
   tasks:
+    - name: Remove old monitoring repo clone
+      file:
+        path: /tmp/healthify-stack
+        state: absent
+
+    - name: Clone latest Healthify repo
+      git:
+        repo: 'https://github.com/SarjakBhandari/Healthify-ProductionPipeline.git'
+        dest: /tmp/healthify-stack
+        version: main
+        force: yes
+
     - name: Create monitoring deployment directory
       file:
         path: /home/jenkins/monitoring-stack
@@ -124,40 +136,48 @@
 
     - name: Copy Grafana datasource provisioning file
       copy:
-        src: "./stack/grafana/datasources/prometheus.yml"
-        dest: "/home/jenkins/monitoring-stack/prometheus-datasource.yml"
+        src: /tmp/healthify-stack/stack/grafana/datasources/prometheus.yml
+        dest: /home/jenkins/monitoring-stack/prometheus-datasource.yml
         owner: jenkins
         group: jenkins
         mode: '0644'
 
     - name: Copy Grafana dashboard provisioning config
       copy:
-        src: "./stack/grafana/dashboards/grafana.yml"
-        dest: "/home/jenkins/monitoring-stack/grafana-dashboard.yml"
+        src: /tmp/healthify-stack/stack/grafana/dashboards/grafana.yml
+        dest: /home/jenkins/monitoring-stack/grafana-dashboard.yml
         owner: jenkins
         group: jenkins
         mode: '0644'
 
     - name: Copy Grafana dashboard JSONs
       copy:
-        src: "./stack/grafana/dashboards/json/"
-        dest: "/home/jenkins/monitoring-stack/dashboards/json/"
+        src: /tmp/healthify-stack/stack/grafana/dashboards/json/
+        dest: /home/jenkins/monitoring-stack/dashboards/json/
         owner: jenkins
         group: jenkins
         mode: '0644'
 
     - name: Copy Prometheus config
       copy:
-        src: "./stack/prometheus/prometheus.yml"
-        dest: "/home/jenkins/monitoring-stack/prometheus.yml"
+        src: /tmp/healthify-stack/stack/prometheus/prometheus.yml
+        dest: /home/jenkins/monitoring-stack/prometheus.yml
         owner: jenkins
         group: jenkins
         mode: '0644'
 
     - name: Copy Prometheus alert rules
       copy:
-        src: "./stack/prometheus/alert.rules.yml"
-        dest: "/home/jenkins/monitoring-stack/alert.rules.yml"
+        src: /tmp/healthify-stack/stack/prometheus/alert.rules.yml
+        dest: /home/jenkins/monitoring-stack/alert.rules.yml
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+
+    - name: Copy monitoring stack file
+      copy:
+        src: /tmp/healthify-stack/stack/prometheus/monitoring.yml
+        dest: /home/jenkins/monitoring-stack/monitoring.yml
         owner: jenkins
         group: jenkins
         mode: '0644'
