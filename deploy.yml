@@ -14,7 +14,7 @@
   become: yes
   tasks:
     - name: Remove existing Healthify stack (if any)
-      shell: docker stack rm healthify 
+      shell: docker stack rm healthify
       args:
         executable: /bin/bash
       ignore_errors: true
@@ -30,7 +30,7 @@
 
     - name: Get image IDs for healthify-frontend
       shell: |
-        docker images --format '{% raw %}{{.Repository}} {{.ID}}{% endraw %}' | \
+        docker images --format '{{.Repository}} {{.ID}}' | \
         grep '192.168.50.4:5000/healthify-frontend' | \
         awk '{print $2}'
       register: frontend_images
@@ -38,7 +38,7 @@
 
     - name: Get image IDs for healthify-backend
       shell: |
-        docker images --format '{% raw %}{{.Repository}} {{.ID}}{% endraw %}' | \
+        docker images --format '{{.Repository}} {{.ID}}' | \
         grep '192.168.50.4:5000/healthify-backend' | \
         awk '{print $2}'
       register: backend_images
@@ -53,7 +53,6 @@
       loop: "{{ all_images }}"
       when: all_images | length > 0
       ignore_errors: yes
-
 
 - name: Deploy Healthify Stack from Manager
   hosts: manager
@@ -97,6 +96,12 @@
         executable: /bin/bash
       ignore_errors: true
 
+    - name: Ensure external volume pgdata exists
+      shell: docker volume create pgdata || true
+      args:
+        executable: /bin/bash
+      ignore_errors: true
+
     - name: Deploy Healthify stack
       shell: docker stack deploy -c /home/jenkins/healthify-stack/docker-stack.yml healthify
       args:
@@ -108,3 +113,34 @@
       debug:
         var: deploy_result.stdout_lines
 
+    - name: Check Healthify service status
+      shell: docker stack services healthify
+      register: service_status
+      changed_when: false
+
+    - name: Display service status
+      debug:
+        var: service_status.stdout_lines
+
+    - name: Get failed tasks for Healthify services
+      shell: |
+        docker service ls --format '{{.Name}}' | grep healthify | while read svc; do
+          echo "Service: $svc"
+          docker service ps $svc --no-trunc | grep -E 'Failed|Rejected|Shutdown'
+        done
+      register: failed_tasks
+      changed_when: false
+
+    - name: Show failed task details
+      debug:
+        var: failed_tasks.stdout_lines
+
+    - name: Wait for frontend to respond
+      uri:
+        url: http://192.168.50.4:5173
+        status_code: 200
+        timeout: 10
+      register: frontend_check
+      retries: 5
+      delay: 5
+      until: frontend_check.status == 200
