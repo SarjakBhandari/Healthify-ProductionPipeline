@@ -1,4 +1,4 @@
-version: "3.8"  # Upgrade for better Swarm compatibility
+version: "3.8"
 
 services:
   postgres:
@@ -46,7 +46,7 @@ services:
       - target: 5050
         published: 5050
         protocol: tcp
-        mode: ingress  # ✅ Changed from host to ingress
+        mode: ingress  
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:5050/health || exit 1"]
       interval: 30s
@@ -58,7 +58,7 @@ services:
   frontend:
     image: 192.168.50.4:5000/healthify-frontend:latest
     environment:
-      API_BASE_URL: http://backend:5050/api  # ✅ Use internal DNS name
+      API_BASE_URL: http://backend:5050/api 
     networks:
       - healthify_net
     deploy:
@@ -72,7 +72,7 @@ services:
       - target: 5173
         published: 5173
         protocol: tcp
-        mode: ingress  # ✅ Changed from host to ingress
+        mode: ingress 
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:5173 || exit 1"]
       interval: 30s
