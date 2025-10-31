@@ -46,7 +46,7 @@ services:
   frontend:
     image: 192.168.50.4:5000/healthify-frontend:latest
     environment:
-      API_BASE_URL: http://backend:5050/api 
+      API_BASE_URL: http://192.168.50.4:5050/api 
     networks:
       - healthify_net
     deploy:
