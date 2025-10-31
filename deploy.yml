@@ -30,21 +30,17 @@
 
     - name: Get image IDs for healthify-frontend
       shell: |
-        {% raw %}
         docker images --format '{{.Repository}} {{.ID}}' | \
         grep '192.168.50.4:5000/healthify-frontend' | \
         awk '{print $2}'
-        {% endraw %}
       register: frontend_images
       changed_when: false
 
     - name: Get image IDs for healthify-backend
       shell: |
-        {% raw %}
         docker images --format '{{.Repository}} {{.ID}}' | \
         grep '192.168.50.4:5000/healthify-backend' | \
         awk '{print $2}'
-        {% endraw %}
       register: backend_images
       changed_when: false
 
@@ -145,7 +141,7 @@
     - name: Copy Grafana dashboard provisioning config
       copy:
         src: /tmp/healthify-stack/stack/grafana/dashboards/grafana.yml
-        dest: /home/jenkins/monitoring-stack/grafana-dashboard.yml
+        dest: /home/jenkins/monitoring-stack/grafana.yml
         owner: jenkins
         group: jenkins
         mode: '0644'
