@@ -16,11 +16,6 @@ services:
       placement:
         constraints:
           - node.role == manager
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
     logging:
       driver: json-file
 
@@ -37,7 +32,7 @@ services:
     networks:
       - healthify_net
     deploy:
-      replicas: 2
+      replicas: 1
       restart_policy:
         condition: on-failure
     ports:
@@ -45,11 +40,6 @@ services:
         published: 5050
         protocol: tcp
         mode: ingress  
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:5050/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
     logging:
       driver: json-file
 
@@ -60,7 +50,7 @@ services:
     networks:
       - healthify_net
     deploy:
-      replicas: 2
+      replicas: 1
       restart_policy:
         condition: on-failure
       update_config:
@@ -71,11 +61,6 @@ services:
         published: 5173
         protocol: tcp
         mode: ingress 
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:5173 || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
     logging:
       driver: json-file
 
