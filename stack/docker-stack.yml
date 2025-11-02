@@ -3,9 +3,9 @@ services:
   postgres:
     image: postgres
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: healthify
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
@@ -21,15 +21,15 @@ services:
       driver: json-file
 
   backend:
-    image: ${REGISTRY}/healthify-backend:latest
+    image: 192.168.50.4:5000/healthify-backend:latest
     environment:
-      PORT: ${BACKEND_PORT}
-      DB_HOST: ${DB_HOST}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
-      JWT_SECRET: ${JWT_SECRET}
-      EXPIRES_IN: ${EXPIRES_IN}
+      PORT: "5050"
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: healthify
+      JWT_SECRET: healthify
+      EXPIRES_IN: 24h
     networks:
       - healthify_net
     deploy:
@@ -37,17 +37,17 @@ services:
       restart_policy:
         condition: on-failure
     ports:
-      - target: ${BACKEND_PORT}
-        published: ${BACKEND_PORT}
+      - target: 5050
+        published: 5050
         protocol: tcp
         mode: ingress  
     logging:
       driver: json-file
 
   frontend:
-    image: ${REGISTRY}/healthify-frontend:latest
+    image: 192.168.50.4:5000/healthify-frontend:latest
     environment:
-      API_BASE_URL: ${API_BASE_URL}
+      API_BASE_URL: http://192.168.50.4:5050/api
     networks:
       - healthify_net
     deploy:
