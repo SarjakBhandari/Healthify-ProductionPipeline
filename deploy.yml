@@ -105,7 +105,14 @@
       register: deploy_result
       changed_when: "'Updating' in deploy_result.stdout or 'Creating' in deploy_result.stdout"
 
-    - name: Display Healthify deployment output
-      debug:
-        var: deploy_result.stdout_lines
+    - name: Deploy Healthify stack
+      shell: |
+        set -a
+        source /home/jenkins/healthify-stack/.env
+        set +a
+        docker stack deploy -c /home/jenkins/healthify-stack/docker-stack.yml healthify
+      args:
+        executable: /bin/bash
+      register: deploy_result
+      changed_when: "'Updating' in deploy_result.stdout or 'Creating' in deploy_result.stdout"
 
