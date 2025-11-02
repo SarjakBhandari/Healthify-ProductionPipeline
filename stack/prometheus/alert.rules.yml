@@ -1,11 +1,71 @@
 groups:
   - name: healthify-alerts
     rules:
-      - alert: NodeDown
+      - alert: NodeExporterDown
         expr: up{job="node-exporter"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          team: devops
+          service: node-exporter
+        annotations:
+          summary: "Node Exporter down on {{ $labels.instance }}"
+          description: |
+            Node Exporter has not been reachable on {{ $labels.instance }} for more than 2 minutes.
+            This may indicate the node is unreachable or the exporter has crashed.
+
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 85
+        for: 3m
+        labels:
+          severity: warning
+          team: devops
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: |
+            CPU usage has exceeded 85% on {{ $labels.instance }} for more than 3 minutes.
+
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+          team: devops
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: |
+            Memory usage is above 90% on {{ $labels.instance }}. Investigate running processes or memory leaks.
+
+      - alert: ContainerRestartSpike
+        expr: increase(container_restart_count[5m]) > 3
+        for: 1m
+        labels:
+          severity: warning
+          team: devops
+        annotations:
+          summary: "Container restarts detected on {{ $labels.instance }}"
+          description: |
+            More than 3 container restarts occurred on {{ $labels.instance }} within 5 minutes. Check logs and health probes.
+
+      - alert: PostgresDown
+        expr: pg_up == 0
         for: 1m
         labels:
           severity: critical
+          team: backend
+          service: postgres
         annotations:
-          summary: "Node exporter is down"
-          description: "Node exporter has not responded for 1 minute."
+          summary: "PostgreSQL is down on {{ $labels.instance }}"
+          description: |
+            PostgreSQL exporter reports the database is unreachable. Immediate attention required.
+
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_size_bytes{mountpoint="/"} - node_filesystem_free_bytes{mountpoint="/"}) / node_filesystem_size_bytes{mountpoint="/"} * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+          team: devops
+        annotations:
+          summary: "Disk usage above 90% on {{ $labels.instance }}"
+          description: |
+            Root filesystem usage is critically high on {{ $labels.instance }}. Consider cleanup or scaling storage.

@@ -1,5 +1,5 @@
 {
-  "uid": "postgres",
+  "uid": "healthify_postgres",
   "title": "PostgreSQL Metrics",
   "timezone": "browser",
   "panels": [
