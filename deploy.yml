@@ -98,12 +98,6 @@
         owner: jenkins
         group: jenkins
         mode: '0644'
-    - name: Deploy Healthify stack
-      shell: docker stack deploy -c /home/jenkins/healthify-stack/docker-stack.yml healthify
-      args:
-        warn: false
-      register: deploy_result
-      changed_when: "'Updating' in deploy_result.stdout or 'Creating' in deploy_result.stdout"
 
     - name: Deploy Healthify stack
       shell: |
