@@ -46,8 +46,8 @@ services:
 
   frontend:
     image: 192.168.50.4:5000/healthify-frontend:latest
-    environment:
-      API_BASE_URL: http://192.168.50.4:5050
+    volumes:
+    - /home/jenkins/healthify-stack/config.js:/usr/src/app/src/config.js
     networks:
       - healthify_net
     deploy:
@@ -64,8 +64,6 @@ services:
         mode: ingress 
     logging:
       driver: json-file
-    command: >
-      sh -c "mkdir -p /usr/src/app/dist && echo \"export const API_BASE_URL = '${API_BASE_URL}/api';\" > /usr/src/app/src/config.js && serve -s dist -l 5173"
   
 
 volumes:
