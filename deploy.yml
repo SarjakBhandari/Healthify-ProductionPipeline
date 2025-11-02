@@ -91,6 +91,13 @@
         executable: /bin/bash
       ignore_errors: true
 
+    - name: Copy .env file to healthify-stack directory
+      copy:
+        src: stack/.env
+        dest: /home/jenkins/healthify-stack/.env
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
     - name: Deploy Healthify stack
       shell: docker stack deploy -c /home/jenkins/healthify-stack/docker-stack.yml healthify
       args:
