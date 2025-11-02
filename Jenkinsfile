@@ -4,7 +4,7 @@ pipeline {
     environment {
         INVENTORY     = "hosts"
         PLAYBOOK      = "deploy.yml"
-        MONITOR_PLAY  = "monitor.yml"
+        MONITOR_PLAY  = "deploy_monitoring.yml"
         ANSIBLE_DIR   = "Healthify-ProductionPipeline"
     }
 
