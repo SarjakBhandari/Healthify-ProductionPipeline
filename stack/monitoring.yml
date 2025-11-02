@@ -9,7 +9,7 @@ services:
     networks:
       - healthify_net
     ports:
-      - "${PROMETHEUS_PORT}:9090"
+      - "9090:9090"
     deploy:
       replicas: 1
       restart_policy:
@@ -32,7 +32,7 @@ services:
     networks:
       - healthify_net
     ports:
-      - "${GRAFANA_PORT}:3000"
+      - "3000:3000"
     deploy:
       replicas: 1
       restart_policy:
@@ -43,7 +43,7 @@ services:
     networks:
       - healthify_net
     ports:
-      - "${NODE_EXPORTER_PORT}:9100"
+      - "9100:9100"
     deploy:
       mode: global
       restart_policy:
@@ -57,7 +57,7 @@ services:
     networks:
       - healthify_net
     ports:
-      - "${POSTGRES_EXPORTER_PORT}:9187"
+      - "9187:9187"
     depends_on:
       - postgres
     deploy:
@@ -75,7 +75,7 @@ services:
     networks:
       - healthify_net
     ports:
-      - "${CADVISOR_PORT}:8080"
+      - "8080:8080"
     deploy:
       mode: global
       restart_policy:
