@@ -8,7 +8,8 @@ services:
         mode: ingress
     volumes:
       - prometheus_data:/prometheus
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - /home/jenkins/monitoring-stack/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - /home/jenkins/monitoring-stack/alert.rules.yml:/etc/prometheus/alert.rules.yml:ro
     networks:
       - healthify_net
     deploy:
@@ -30,6 +31,9 @@ services:
         mode: ingress
     volumes:
       - grafana_data:/var/lib/grafana
+      - /home/jenkins/monitoring-stack/prometheus-datasource.yml:/etc/grafana/provisioning/datasources/prometheus.yml:ro
+      - /home/jenkins/monitoring-stack/grafana.yml:/etc/grafana/provisioning/dashboards/grafana.yml:ro
+      - /home/jenkins/monitoring-stack/dashboards/json:/var/lib/grafana/dashboards:ro
     networks:
       - healthify_net
     deploy:
