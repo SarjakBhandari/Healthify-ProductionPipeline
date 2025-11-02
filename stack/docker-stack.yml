@@ -1,6 +1,6 @@
 ---
 services:
-  postgres:
+  healthify_postgres:
     image: postgres:16
     environment:
       POSTGRES_USER: postgres
