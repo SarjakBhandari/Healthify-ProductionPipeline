@@ -95,13 +95,21 @@
       args:
         executable: /bin/bash
 
-    - name: Deploy monitoring stack
-      shell: docker stack deploy -c /home/jenkins/monitoring-stack/monitoring.yml monitoring
+    - name: Copy .env file to monitoring-stack directory
+      copy:
+        src: ./stack/.env
+        dest: /home/jenkins/monitoring-stack/.env
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+
+    - name: Deploy Monitoring stack
+      shell: |
+        set -a
+        source /home/jenkins/monitoring-stack/.env
+        set +a
+        docker stack deploy -c /home/jenkins/monitoring-stack/monitoring.yml monitoring
       args:
-        warn: false
+        executable: /bin/bash
       register: monitoring_result
       changed_when: "'Updating' in monitoring_result.stdout or 'Creating' in monitoring_result.stdout"
-
-    - name: Display monitoring deployment output
-      debug:
-        var: monitoring_result.stdout_lines
