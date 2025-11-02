@@ -24,10 +24,10 @@ services:
     image: ${REGISTRY}/healthify-backend:latest
     environment:
       PORT: ${BACKEND_PORT}
-      DB_HOST: ${DB_HOST}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
+      DB_HOST: postgres
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
       EXPIRES_IN: ${EXPIRES_IN}
     networks:
