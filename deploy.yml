@@ -93,7 +93,7 @@
 
     - name: Copy .env file to healthify-stack directory
       copy:
-        src: ./.env
+        src: ./stack/.env
         dest: /home/jenkins/healthify-stack/.env
         owner: jenkins
         group: jenkins
