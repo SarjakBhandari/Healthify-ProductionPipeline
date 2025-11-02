@@ -47,7 +47,7 @@ services:
   frontend:
     image: 192.168.50.4:5000/healthify-frontend:latest
     environment:
-      API_BASE_URL: http://192.168.50.4:5050/api
+      API_BASE_URL: http://192.168.50.4:5050
     networks:
       - healthify_net
     deploy:
@@ -61,9 +61,11 @@ services:
       - target: 5173
         published: 5173
         protocol: tcp
-        mode: ingress 
+        mode: ingress
     logging:
       driver: json-file
+    command: >
+      sh -c "echo \"export const API_BASE_URL = '${API_BASE_URL}/api';\" > /usr/src/app/dist/config.js && serve -s dist -l 5173"
 
 volumes:
   pgdata:
