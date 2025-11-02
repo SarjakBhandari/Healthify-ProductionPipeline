@@ -115,4 +115,3 @@
         executable: /bin/bash
       register: deploy_result
       changed_when: "'Updating' in deploy_result.stdout or 'Creating' in deploy_result.stdout"
-
