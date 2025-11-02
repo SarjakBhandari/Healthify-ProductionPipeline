@@ -2,28 +2,61 @@
   "uid": "cadvisor",
   "title": "cAdvisor Container Metrics",
   "timezone": "browser",
+  "schemaVersion": 36,
+  "version": 2,
   "panels": [
     {
       "type": "graph",
       "title": "Container CPU Usage",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
       "targets": [
         {
           "expr": "rate(container_cpu_usage_seconds_total{container_label_com_docker_swarm_service_name=~\".+\"}[1m])",
-          "legendFormat": "{{container_label_com_docker_swarm_service_name}}"
+          "legendFormat": "{{container_label_com_docker_swarm_service_name}}",
+          "refId": "A"
         }
       ]
     },
     {
       "type": "graph",
       "title": "Container Memory Usage",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
       "targets": [
         {
           "expr": "container_memory_usage_bytes{container_label_com_docker_swarm_service_name=~\".+\"}",
-          "legendFormat": "{{container_label_com_docker_swarm_service_name}}"
+          "legendFormat": "{{container_label_com_docker_swarm_service_name}}",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Container Filesystem Usage",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "container_fs_usage_bytes{container_label_com_docker_swarm_service_name=~\".+\"}",
+          "legendFormat": "{{container_label_com_docker_swarm_service_name}}",
+          "refId": "C"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Container Network I/O",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "rate(container_network_receive_bytes_total{container_label_com_docker_swarm_service_name=~\".+\"}[1m])",
+          "legendFormat": "RX {{container_label_com_docker_swarm_service_name}}",
+          "refId": "D"
+        },
+        {
+          "expr": "rate(container_network_transmit_bytes_total{container_label_com_docker_swarm_service_name=~\".+\"}[1m])",
+          "legendFormat": "TX {{container_label_com_docker_swarm_service_name}}",
+          "refId": "E"
         }
       ]
     }
-  ],
-  "schemaVersion": 36,
-  "version": 1
+  ]
 }

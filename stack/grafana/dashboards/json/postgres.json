@@ -2,28 +2,61 @@
   "uid": "healthify_postgres",
   "title": "PostgreSQL Metrics",
   "timezone": "browser",
+  "schemaVersion": 36,
+  "version": 2,
   "panels": [
     {
       "type": "graph",
       "title": "Active Connections",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
       "targets": [
         {
           "expr": "pg_stat_activity_count",
-          "legendFormat": "Connections"
+          "legendFormat": "Connections",
+          "refId": "A"
         }
       ]
     },
     {
       "type": "graph",
       "title": "Cache Hit Ratio",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
       "targets": [
         {
           "expr": "pg_stat_database_blks_hit / (pg_stat_database_blks_hit + pg_stat_database_blks_read)",
-          "legendFormat": "Cache Hit"
+          "legendFormat": "Cache Hit Ratio",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Deadlocks",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "pg_stat_database_deadlocks",
+          "legendFormat": "Deadlocks",
+          "refId": "C"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Tuples Returned vs Fetched",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "pg_stat_database_tuples_returned",
+          "legendFormat": "Returned",
+          "refId": "D"
+        },
+        {
+          "expr": "pg_stat_database_tuples_fetched",
+          "legendFormat": "Fetched",
+          "refId": "E"
         }
       ]
     }
-  ],
-  "schemaVersion": 36,
-  "version": 1
+  ]
 }
