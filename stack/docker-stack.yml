@@ -64,9 +64,7 @@ services:
         mode: ingress
     logging:
       driver: json-file
-    command: >
-      sh -c "echo \"export const API_BASE_URL = '${API_BASE_URL}/api';\" > /usr/src/app/dist/config.js && serve -s dist -l 5173"
-
+  
 volumes:
   pgdata:
     external: true
