@@ -78,7 +78,7 @@
         group: jenkins
         mode: '0644'
         force: yes
-        
+
     - name: Inject API URL into frontend config.js
       copy:
         dest: /home/jenkins/healthify-stack/config.js
@@ -101,9 +101,6 @@
 
     - name: Deploy Healthify stack
       shell: |
-        set -a
-        source /home/jenkins/healthify-stack/.env
-        set +a
         docker stack deploy -c /home/jenkins/healthify-stack/docker-stack.yml healthify
       args:
         executable: /bin/bash
