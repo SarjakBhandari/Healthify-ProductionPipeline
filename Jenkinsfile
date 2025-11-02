@@ -2,9 +2,10 @@ pipeline {
     agent { label 'ProductionENV' }
 
     environment {
-        INVENTORY   = "hosts"
-        PLAYBOOK    = "deploy.yml"
-        ANSIBLE_DIR = "Healthify-ProductionPipeline"
+        INVENTORY     = "hosts"
+        PLAYBOOK      = "deploy.yml"
+        MONITOR_PLAY  = "monitor.yml"
+        ANSIBLE_DIR   = "Healthify-ProductionPipeline"
     }
 
     stages {
@@ -15,21 +16,48 @@ pipeline {
             }
         }
 
-    stage('Deploy Healthify & Monitoring Stack') {
-        steps {
-            dir("${ANSIBLE_DIR}") {
-                sh '''
-                    set -e
-                    echo ">>> Running Ansible Playbook for Swarm Deployment..."
-                    ansible-playbook --syntax-check -i ${INVENTORY} ${PLAYBOOK}
-                    ansible-playbook -i ${INVENTORY} ${PLAYBOOK}
-                '''
+        stage('Deploy Healthify Stack') {
+            steps {
+                dir("${ANSIBLE_DIR}") {
+                    sh '''
+                        set -e
+                        echo ">>> Running Ansible Playbook for Healthify Deployment..."
+                        ansible-playbook --syntax-check -i ${INVENTORY} ${PLAYBOOK}
+                        ansible-playbook -i ${INVENTORY} ${PLAYBOOK}
+                    '''
+                }
+            }
+        }
+
+        stage('Confirm Monitoring Deployment') {
+            steps {
+                script {
+                    def userInput = input(
+                        id: 'monitorConfirm', message: 'Do you want to deploy the monitoring stack?', parameters: [
+                            booleanParam(defaultValue: false, description: 'Deploy monitor.yml?', name: 'DEPLOY_MONITORING')
+                        ]
+                    )
+                    env.DEPLOY_MONITORING = userInput.toString()
+                }
+            }
+        }
+
+        stage('Deploy Monitoring Stack') {
+            when {
+                expression { env.DEPLOY_MONITORING == 'true' }
+            }
+            steps {
+                dir("${ANSIBLE_DIR}") {
+                    sh '''
+                        set -e
+                        echo ">>> Running Ansible Playbook for Monitoring Deployment..."
+                        ansible-playbook --syntax-check -i ${INVENTORY} ${MONITOR_PLAY}
+                        ansible-playbook -i ${INVENTORY} ${MONITOR_PLAY}
+                    '''
+                }
             }
         }
     }
-    }  
-
-
 
     post {
         success {
