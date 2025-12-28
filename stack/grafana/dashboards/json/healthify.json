@@ -3,51 +3,131 @@
   "title": "Healthify Backend Metrics",
   "timezone": "browser",
   "schemaVersion": 36,
-  "version": 1,
+  "version": 2,
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
   "panels": [
     {
-      "type": "graph",
+      "type": "timeseries",
       "title": "HTTP Request Count",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
       "targets": [
         {
           "expr": "sum by (method, route) (http_requests_total)",
-          "legendFormat": "{{method}} {{route}}"
+          "legendFormat": "{{method}} {{route}}",
+          "refId": "A"
         }
       ],
-      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 }
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "lines",
+            "lineWidth": 2,
+            "fillOpacity": 20,
+            "showPoints": "never"
+          }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "right", "showLegend": true },
+        "tooltip": { "mode": "single" }
+      }
     },
     {
-      "type": "graph",
-      "title": "HTTP Request Duration",
+      "type": "timeseries",
+      "title": "HTTP Request Duration (95th Percentile)",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
       "targets": [
         {
           "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[1m])) by (le, route))",
-          "legendFormat": "95th percentile {{route}}"
+          "legendFormat": "95th percentile {{route}}",
+          "refId": "B"
         }
       ],
-      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 }
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "lines",
+            "lineWidth": 2,
+            "fillOpacity": 15,
+            "showPoints": "never"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": 0 },
+              { "color": "orange", "value": 1 },
+              { "color": "red", "value": 2 }
+            ]
+          }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "right", "showLegend": true },
+        "tooltip": { "mode": "single" }
+      }
     },
     {
-      "type": "graph",
+      "type": "timeseries",
       "title": "HTTP Error Count",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
       "targets": [
         {
-          "expr": "sum by (status, route) (http_errors_total)",
-          "legendFormat": "{{status}} {{route}}"
+          "expr": "sum(increase(http_requests_total{status=~\"4..|5..\"}[1m])) by (status, route)",
+          "legendFormat": "{{status}} {{route}}",
+          "refId": "C"
         }
       ],
-      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 }
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "bars",
+            "barAlignment": 0,
+            "fillOpacity": 80,
+            "showPoints": "never"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": 0 },
+              { "color": "red", "value": 10 }
+            ]
+          }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "single" }
+      }
     },
     {
-      "type": "graph",
+      "type": "timeseries",
       "title": "Frontend Route Changes",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
       "targets": [
         {
-          "expr": "sum by (path) (frontend_route_change_total)",
-          "legendFormat": "{{path}}"
+          "expr": "sum(rate(frontend_route_change_total[1m])) by (path)",
+          "legendFormat": "Route: {{path}}",
+          "refId": "D"
         }
       ],
-      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 }
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "lines",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "right", "showLegend": true },
+        "tooltip": { "mode": "single" }
+      }
     }
   ]
 }
